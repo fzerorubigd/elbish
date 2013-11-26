@@ -1,0 +1,16 @@
+---
+root:
+  _type: array
+  _ignore_extra_keys: true
+  _children:
+    site:
+      _type: array
+      _ignore_extra_keys: true
+      _children:
+        title:
+          _type: text
+          _not_empty: true
+        base_url:
+          _type: pattern
+          _required: true
+          _pattern: /\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i

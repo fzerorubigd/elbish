@@ -1,0 +1,25 @@
+---
+root:
+  _type: array
+  _ignore_extra_keys: false
+  _children:
+    yaml:
+      _type: array
+      _ignore_extra_keys: true
+      _children:
+        Slug:
+          _type: text
+        Date:
+          _type: text
+        Author:
+          _type: text
+        Tags:
+          _type: array
+          _ignore_extra_keys: true
+          _children: []
+        Groups:
+          _type: array
+          _ignore_extra_keys: true
+          _children: []
+    text:
+      _type: text

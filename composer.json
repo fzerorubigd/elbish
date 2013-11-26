@@ -1,0 +1,30 @@
+{
+    "name": "fzerorubigd/elbish.php",
+    "description": "A simple static-content publishing system",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+	"fzerorubigd/yaml-front-matter": "dev-master",
+        "symfony/yaml": "~2.3",
+        "kriswallsmith/assetic": "~1.1",
+        "twig/twig": "~1",
+        "michelf/php-markdown": "~1.3",
+        "symfony/console": "~2.3",
+        "romaricdrigon/metayaml": "dev-master"
+    },
+    "license": "MIT",
+    "config": {
+        "bin-dir": "bin/"
+    },
+    "autoload": {
+        "psr-0": {
+            "Cybits": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "fzerorubigd",
+            "email": "fzerorubigd@gmail.com"
+        }
+    ]
+}

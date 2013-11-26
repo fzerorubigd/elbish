@@ -1,0 +1,11 @@
+/vendor
+composer.phar
+composer.lock
+*.swp
+*.swo
+TAGS
+.#*
+/.idea
+/.idea/*
+/docs
+/phpdoc-*
