@@ -2,4 +2,16 @@
 site:
   title: This is my title
   base_url: http://cyberrabbits.net
+  target_dir: _target
+  cache_dir: _cache
+  post_url: ':year/:month/:slug'
+  no_ext: true
+
+posts:
+  path: posts
+
+  new_post_pattern: :ext/:year/:month
+
+twig:
+  path: templates
 

@@ -14,12 +14,15 @@ abstract class Base implements \ArrayAccess
      * Load a file using data
      *
      * @param array $data loaded data into an array
+     * @param boolean $force force validation on data
      */
-    public function __construct(array $data)
+    public function __construct(array $data, $force = true)
     {
         $schema = $this->loadSchema();
         //TODO : Better error handling
-        $schema->validate($data);
+        if ($force) {
+            $schema->validate($data);
+        }
         $this->data = $data;
     }
 

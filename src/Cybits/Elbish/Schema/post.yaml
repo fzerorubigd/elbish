@@ -3,23 +3,20 @@ root:
   _type: array
   _ignore_extra_keys: false
   _children:
-    yaml:
+    title:
+      _type: text
+      _required: true
+    slug:
+      _type: text
+    date:
+      _type: text
+    author:
+      _type: text
+    tags:
       _type: array
       _ignore_extra_keys: true
-      _children:
-        Slug:
-          _type: text
-        Date:
-          _type: text
-        Author:
-          _type: text
-        Tags:
-          _type: array
-          _ignore_extra_keys: true
-          _children: []
-        Groups:
-          _type: array
-          _ignore_extra_keys: true
-          _children: []
-    text:
-      _type: text
+      _children: []
+    groups:
+      _type: array
+      _ignore_extra_keys: true
+      _children: []

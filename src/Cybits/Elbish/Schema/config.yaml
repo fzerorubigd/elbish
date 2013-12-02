@@ -14,3 +14,28 @@ root:
           _type: pattern
           _required: true
           _pattern: /\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i
+        post_url:
+          _type: text
+          _required: true
+        no_ext:
+          _type: boolean
+        target_dir:
+          _type: text
+        cache_dir:
+          _type: text
+
+    twig:
+      _type: array
+      _ignore_extra_keys: true
+      _children:
+        path:
+          _type: text
+
+    posts:
+      _type: array
+      _ignore_extra_keys: true
+      _children:
+        path:
+          _type: text
+        new_post_pattern:
+          _type: text

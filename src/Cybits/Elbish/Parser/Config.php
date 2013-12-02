@@ -18,7 +18,11 @@ class Config extends Base
      */
     public function __construct($configFile)
     {
-        parent::__construct(Yaml::parse($configFile));
+        if (file_exists($configFile)) {
+            parent::__construct(Yaml::parse($configFile));
+        } else {
+            parent::__construct(array(), false);
+        }
     }
 
     /**

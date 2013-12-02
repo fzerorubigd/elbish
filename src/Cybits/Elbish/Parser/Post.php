@@ -2,7 +2,6 @@
 
 namespace Cybits\Elbish\Parser;
 
-
 use Cybits\Yaml\FrontMatter;
 use RomaricDrigon\MetaYaml\MetaYaml;
 use Symfony\Component\Yaml\Yaml;
@@ -12,15 +11,25 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @package Cybits\Elbish\Parser
  */
-class Post extends Base
+abstract class Post extends Base
 {
+    protected $text;
     /**
      * @param array $postFile post file to load, must be a yaml-front-matter file
      */
     public function __construct($postFile)
     {
-        parent::__construct(FrontMatter::parse($postFile));
+        $fm = FrontMatter::parse($postFile);
+        $this->text = $fm['text'];
+        parent::__construct($fm['yaml']);
     }
+
+    /**
+     * Get the transformed text part of front matter
+     *
+     * @return string
+     */
+    abstract public function getText();
     /**
      * Get this file validator
      *
@@ -34,4 +43,11 @@ class Post extends Base
 
         return $schema;
     }
+
+    /**
+     * @param $fileName
+     *
+     * @return bool if the file is supported then load is happen here
+     */
+    abstract public function isSupported($fileName);
 }

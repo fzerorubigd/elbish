@@ -1,6 +1,11 @@
 <html>
 <head>
-
+    <title>{{ config.site.title }} - {% block title %}{% endblock title %}</title>
 </head>
+<body>
+    {% block content %}
+        feed me :)
+    {% endblock content %}
+</body>
 
 </html>
