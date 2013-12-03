@@ -29,6 +29,21 @@ class BuildPosts extends Base
         }
     }
 
+    protected function saveCache()
+    {
+        $cacheDir = $this->getApplication()->getCurrentDir() . '/' .
+            $this->getApplication()->getConfig()->get('site.cache_dir', '.cache');
+        try {
+            if (!is_dir($cacheDir)) {
+                @mkdir($cacheDir, 0777, true);
+            }
+            file_put_contents($cacheDir . '/posts.cache.yaml', Yaml::dump($this->cache));
+        } catch (\Exception $e) {
+            //TODO : change php warnings to error
+            // :/ do nothing.
+        }
+    }
+
     protected function configure()
     {
         $this->setName("build-posts")
@@ -65,9 +80,10 @@ EOT
                     continue;
                 }
             }
-            $this->cache[$identifier] = array ('md5' => $md5);
+            $this->cache[$identifier] = array('md5' => $md5);
             $post = new Markdown($file->getRealPath());
             $twig = $this->getApplication()->getTwig();
+            //TODO : Template plugin to use other type of markups, like mustache or handlebars
             $result = $twig->render('post.twig', array('post' => $post));
 
             $target = $this->getApplication()->getConfig()->get('site.post_url', ':year/:month/:slug');
@@ -99,7 +115,6 @@ EOT
             file_put_contents($target, $result);
             $output->writeln(' .... <info>DONE</info>');
         }
+        $this->saveCache();
     }
-
-
-} 
+}

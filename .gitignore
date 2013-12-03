@@ -9,3 +9,4 @@ TAGS
 /.idea/*
 /docs
 /phpdoc-*
+/example/_*

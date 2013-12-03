@@ -1,4 +1,4 @@
 elbish
 ======
 
-Another static publishing system
+Another static publishing system, not even ready to test.
