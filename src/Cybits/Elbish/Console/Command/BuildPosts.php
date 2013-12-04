@@ -58,6 +58,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $force = $input->getOption('force');
         $postsFolder = $this->getApplication()->getCurrentDir() .
             '/' .
             $this->getApplication()->getConfig()->get('posts.path', 'posts');
@@ -69,14 +70,20 @@ EOT
         $this->loadCache();
         /** @var $file SplFileInfo */
         foreach ($finder as $file) {
-            $output->write('<info>Processing ' . $file->getFilename() . '</info>');
+            $output->write('<info>Processing ' . $file->getFilename() . '</info> ');
             // For now all files are markdown files
             $md5 = md5_file($file->getRealPath());
             $identifier = md5($file->getRealPath()); // :)
-            if (isset($this->cache[$identifier])) {
+            if (isset($this->cache[$identifier]) && !$force) {
                 $data = $this->cache[$identifier];
-                if ($data['md5'] == $md5) {
-                    $output->writeln('<info>File ' . $file->getRealPath() . ' has no change. skipping</info>');
+                if (isset($data['md5']) &&
+                    isset($data['target']) &&
+                    isset($data['target_md5']) &&
+                    $data['md5'] == $md5 &&
+                    is_readable($data['target']) &&
+                    md5_file($data['target']) == $data['target_md5']
+                ) {
+                    $output->writeln(' .... <info>File has no change. skipping</info>');
                     continue;
                 }
             }
@@ -113,6 +120,8 @@ EOT
             }
 
             file_put_contents($target, $result);
+            $this->cache[$identifier]['target'] = $target;
+            $this->cache[$identifier]['target_md5'] = md5_file($target);
             $output->writeln(' .... <info>DONE</info>');
         }
         $this->saveCache();
