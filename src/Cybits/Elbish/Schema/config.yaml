@@ -39,3 +39,13 @@ root:
           _type: text
         new_post_pattern:
           _type: text
+
+    posts:
+      _type: array
+      _ignore_extra_keys: true
+      _children:
+        path:
+          _type: text
+        post_word_limit:
+          _type: number
+

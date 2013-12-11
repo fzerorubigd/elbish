@@ -12,6 +12,10 @@ posts:
 
   new_post_pattern: :ext/:year/:month
 
+collections:
+  path: collections
+  post_word_limit: 100
+
 twig:
   path: templates
 

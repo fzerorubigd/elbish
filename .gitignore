@@ -9,4 +9,5 @@ TAGS
 /.idea/*
 /docs
 /phpdoc-*
-/example/_*
+/tests/example/_*
+bin/phpunit

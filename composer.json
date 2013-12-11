@@ -1,10 +1,10 @@
 {
-    "name": "fzerorubigd/elbish.php",
+    "name": "fzerorubigd/elbish",
     "description": "A simple static-content publishing system",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-	"fzerorubigd/yaml-front-matter": "dev-master",
+        "fzerorubigd/yaml-front-matter": "dev-master",
         "symfony/yaml": "~2.3",
         "kriswallsmith/assetic": "~1.1",
         "twig/twig": "~1",
@@ -12,6 +12,9 @@
         "symfony/console": "~2.3",
         "romaricdrigon/metayaml": "dev-master",
         "symfony/finder": "~2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~3.7"
     },
     "license": "MIT",
     "config": {
