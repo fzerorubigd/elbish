@@ -11,16 +11,15 @@ abstract class Base implements \ArrayAccess, \IteratorAggregate
     protected $data;
 
     /**
-     * Load a file using data
+     * Load data into the parser
      *
      * @param array   $data  loaded data into an array
      * @param boolean $force force validation on data
      */
-    public function __construct(array $data, $force = true)
+    final public function loadData(array $data, $force = true)
     {
-        $schema = $this->loadSchema();
-        //TODO : Better error handling
         if ($force) {
+            $schema = $this->loadSchema();
             $schema->validate($data);
         }
         $this->data = $data;

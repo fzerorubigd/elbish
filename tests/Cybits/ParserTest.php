@@ -3,6 +3,7 @@
 namespace Cybits;
 
 use Cybits\Elbish\Parser\Post\Markdown;
+use Cybits\Elbish\Parser\Post;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,9 +51,20 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     public function testValidPost()
     {
-        $post = new Markdown($this->examplePath . "/posts/example.md");
+        $post = new Post();
+        $this->assertTrue($post->loadFrontMatter($this->examplePath . "/posts/example.md"));
+        $this->assertContains("This is an example post.", $post->getText());
+        $this->assertTrue($post->isSupported($this->examplePath . "/posts/example.md"));
+        $this->assertTrue($post->isSupported($this->examplePath . "/config.yaml"));
+
+        $post = new Markdown();
+        $this->assertTrue($post->loadFrontMatter($this->examplePath . "/posts/example.md"));
         $this->assertContains("<p>This is an example post.</p>", $post->getText());
         $this->assertTrue($post->isSupported($this->examplePath . "/posts/example.md"));
         $this->assertFalse($post->isSupported($this->examplePath . "/config.yaml"));
+
+        $this->assertFalse($post->loadFrontMatter($this->examplePath . "/config.yaml"));
+        $this->assertFalse($post->loadFrontMatter($this->examplePath . "/config.md"));
+
     }
 }

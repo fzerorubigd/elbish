@@ -11,17 +11,25 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @package Cybits\Elbish\Parser
  */
-abstract class Post extends Base
+class Post extends Base
 {
     protected $text;
-    /**
-     * @param array $postFile post file to load, must be a yaml-front-matter file
-     */
-    public function __construct($postFile)
+
+    public function loadFrontMatter($fileName)
     {
-        $fm = FrontMatter::parse($postFile);
-        $this->text = $fm['text'];
-        parent::__construct($fm['yaml']);
+        if (!$this->isSupported($fileName)) {
+            return false;
+        }
+
+        try {
+            $fm = FrontMatter::parse($fileName);
+            $this->text = $fm['text'];
+            $this->loadData($fm['yaml']);
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -29,7 +37,11 @@ abstract class Post extends Base
      *
      * @return string
      */
-    abstract public function getText();
+    public function getText()
+    {
+        return $this->text;
+    }
+
     /**
      * Get this file validator
      *
@@ -49,5 +61,9 @@ abstract class Post extends Base
      *
      * @return bool if the file is supported then load is happen here
      */
-    abstract public function isSupported($fileName);
+    public function isSupported($fileName)
+    {
+        // This default support every file type, so work as a fallback.
+        return true;
+    }
 }

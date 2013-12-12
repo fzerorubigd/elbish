@@ -88,7 +88,8 @@ EOT
                 }
             }
             $this->cache[$identifier] = array('md5' => $md5);
-            $post = new Markdown($file->getRealPath());
+            $post = $this->getApplication()->getParserForFile($file->getRealPath());
+            $post->loadFrontMatter($file->getRealPath());
             $twig = $this->getApplication()->getTwig();
             //TODO : Template plugin to use other type of markups, like mustache or handlebars
             $result = $twig->render('post.twig', array('post' => $post));

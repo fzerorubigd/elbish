@@ -19,9 +19,9 @@ class Config extends Base
     public function __construct($configFile)
     {
         if (file_exists($configFile)) {
-            parent::__construct(Yaml::parse($configFile));
+            $this->loadData(Yaml::parse($configFile));
         } else {
-            parent::__construct(array(), false);
+            $this->loadData(array(), false);
         }
     }
 

@@ -8,8 +8,7 @@ use Cybits\Elbish\Console\Command\NewPost;
 use Cybits\Elbish\Console\Command\Test;
 use Cybits\Elbish\Exception\NotFound;
 use Cybits\Elbish\Parser\Config;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Cybits\Elbish\Parser\Post;
 
 class Application extends \Symfony\Component\Console\Application
 {
@@ -26,6 +25,9 @@ class Application extends \Symfony\Component\Console\Application
     /** @var  \Twig_Environment */
     protected $twig;
 
+    /** @var  Parser\Post[] */
+    protected $parsers = array();
+
     public function __construct()
     {
         parent::__construct(self::APP_NAME, self::VERSION);
@@ -33,6 +35,12 @@ class Application extends \Symfony\Component\Console\Application
 
         $this->add(new NewPost());
         $this->add(new BuildPosts());
+
+
+        // Register default parsers
+        // Post parser is available if there is no other parser is there
+        $this->registerParser(new Post());
+        $this->registerParser(new Post\Markdown());
     }
 
 
@@ -71,6 +79,31 @@ class Application extends \Symfony\Component\Console\Application
     public function getCurrentDir()
     {
         return $this->currentDir;
+    }
+
+    public function registerParser(Post $parser)
+    {
+        array_unshift($this->parsers, $parser);
+    }
+
+    /**
+     * Get the parser for file
+     *
+     * @param string $filename file name to parse
+     *
+     * @return Post
+     */
+    public function getParserForFile($filename)
+    {
+        $result = null;
+        foreach ($this->parsers as $parser) {
+            if ($parser->isSupported($filename)) {
+                $result = $parser;
+                break;
+            }
+        }
+
+        return $result;
     }
 
     /**
