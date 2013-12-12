@@ -1,3 +1,12 @@
 inherit: true
+filter:
+    excluded_paths:
+        - 'vendor/*'
+
+before_commands:
+    - composer install --dev
+
 tools:
+    php_cpd: true
+    php_pdepend: true
     php_code_coverage: true

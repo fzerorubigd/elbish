@@ -3,7 +3,6 @@
 namespace Cybits\Elbish\Console\Command;
 
 
-use Cybits\Elbish\Parser\Post\Markdown;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -50,10 +49,75 @@ class BuildPosts extends Base
             ->setDescription("Collect and build posts.")
             ->setDefinition(array())
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force rebuild all, use when template is changed')
-            ->setHelp(<<<EOT
+            ->setHelp(
+                <<<EOT
 Build all new or changed posts, can force to build all again
 EOT
             );
+    }
+
+    private function processFile(SplFileInfo $file, $targetFolder)
+    {
+        $identifier = md5($file->getRealPath()); // :)
+        $post = $this->getApplication()->getParserForFile($file->getRealPath());
+        $post->loadFrontMatter($file->getRealPath());
+        $twig = $this->getApplication()->getTwig();
+        //TODO : Template plugin to use other type of markups, like mustache or handlebars
+        $result = $twig->render('post.twig', array('post' => $post));
+
+        $target = $this->getApplication()->getConfig()->get('site.post_url', ':year/:month/:slug');
+        $noExt = $this->getApplication()->getConfig()->get('site.no_ext', true);
+
+        $overwrite = array(':slug' => $file->getBasename('.' . $file->getExtension()));
+        if (isset($post['date'])) {
+            $date = strtotime($post['date']);
+        } else {
+            // Try to load it from file time, not a good way, but what can I do??
+            $date = $file->getCTime();
+        }
+        foreach ($post as $key => $value) {
+            if (is_scalar($value)) {
+                $overwrite[':' . $key] = $value;
+            }
+        }
+        $target = $targetFolder . '/' . $this->getPattern($target, $date, $overwrite);
+        if ($noExt) {
+            $target .= '/index.html';
+        } else {
+            $target .= '.html';
+        }
+
+        if (!is_dir(dirname($target))) {
+            mkdir(dirname($target), 0777, true);
+        }
+
+        file_put_contents($target, $result);
+        $this->cache[$identifier]['target'] = $target;
+        $this->cache[$identifier]['target_md5'] = md5_file($target);
+
+        return true;
+    }
+
+    private function isCached(SplFileInfo $file, $force)
+    {
+        // For now all files are markdown files
+        $hash = md5_file($file->getRealPath());
+        $identifier = md5($file->getRealPath()); // :)
+        if (isset($this->cache[$identifier]) && !$force) {
+            $data = $this->cache[$identifier];
+            if (isset($data['md5']) &&
+                isset($data['target']) &&
+                isset($data['target_md5']) &&
+                $data['md5'] == $hash &&
+                is_readable($data['target']) &&
+                md5_file($data['target']) == $data['target_md5']
+            ) {
+                return true;
+            }
+        }
+        $this->cache[$identifier] = array('md5' => $hash);
+
+        return false;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -71,59 +135,12 @@ EOT
         /** @var $file SplFileInfo */
         foreach ($finder as $file) {
             $output->write('<info>Processing ' . $file->getFilename() . '</info> ');
-            // For now all files are markdown files
-            $md5 = md5_file($file->getRealPath());
-            $identifier = md5($file->getRealPath()); // :)
-            if (isset($this->cache[$identifier]) && !$force) {
-                $data = $this->cache[$identifier];
-                if (isset($data['md5']) &&
-                    isset($data['target']) &&
-                    isset($data['target_md5']) &&
-                    $data['md5'] == $md5 &&
-                    is_readable($data['target']) &&
-                    md5_file($data['target']) == $data['target_md5']
-                ) {
-                    $output->writeln(' .... <info>File has no change. skipping</info>');
-                    continue;
-                }
-            }
-            $this->cache[$identifier] = array('md5' => $md5);
-            $post = $this->getApplication()->getParserForFile($file->getRealPath());
-            $post->loadFrontMatter($file->getRealPath());
-            $twig = $this->getApplication()->getTwig();
-            //TODO : Template plugin to use other type of markups, like mustache or handlebars
-            $result = $twig->render('post.twig', array('post' => $post));
-
-            $target = $this->getApplication()->getConfig()->get('site.post_url', ':year/:month/:slug');
-            $noExt = $this->getApplication()->getConfig()->get('site.no_ext', true);
-
-            $overwrite = array(':slug' => $file->getBasename('.' . $file->getExtension()));
-            if (isset($post['date'])) {
-                $date = strtotime($post['date']);
+            if ($this->isCached($file, $force)) {
+                $output->writeln(' .... <info>File has no change. skipping</info>');
             } else {
-                // Try to load it from file time, not a good way, but what can I do??
-                $date = $file->getCTime();
+                $this->processFile($file, $targetFolder);
+                $output->writeln(' .... <info>DONE</info>');
             }
-            foreach ($post as $key => $value) {
-                if (is_scalar($value)) {
-                    $overwrite[':' . $key] = $value;
-                }
-            }
-            $target = $targetFolder . '/' . $this->getPattern($target, $date, $overwrite);
-            if ($noExt) {
-                $target .= '/index.html';
-            } else {
-                $target .= '.html';
-            }
-
-            if (!is_dir(dirname($target))) {
-                mkdir(dirname($target), 0777, true);
-            }
-
-            file_put_contents($target, $result);
-            $this->cache[$identifier]['target'] = $target;
-            $this->cache[$identifier]['target_md5'] = md5_file($target);
-            $output->writeln(' .... <info>DONE</info>');
         }
         $this->saveCache();
     }
