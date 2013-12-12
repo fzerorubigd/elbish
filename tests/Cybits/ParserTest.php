@@ -2,10 +2,7 @@
 
 namespace Cybits;
 
-use Cybits\Elbish\Exception\NotSupported;
 use Cybits\Elbish\Parser\Post\Markdown;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
@@ -57,61 +54,5 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->assertContains("<p>This is an example post.</p>", $post->getText());
         $this->assertTrue($post->isSupported($this->examplePath . "/posts/example.md"));
         $this->assertFalse($post->isSupported($this->examplePath . "/config.yaml"));
-    }
-
-    public function testNewPostCommand()
-    {
-        chdir($this->examplePath . "/posts");
-        if (file_exists('__/__example__.md')) {
-            @unlink('__/__example__.md');
-            @rmdir('__');
-        }
-        $app = new Elbish\Application();
-        $command = $app->find('new-post');
-
-        $cmdTester = new CommandTester($command);
-
-        $cmdTester->execute(
-            array(
-                'command' => $command->getName(),
-                'filename' => "__/__example__",
-                'title' => "Test post",
-                'ext' => 'md'
-            )
-        );
-        $text = file_get_contents('__/__example__.md');
-        $this->assertContains("Test post", $text);
-
-        @unlink('__/__example__.md');
-        @rmdir('__');
-    }
-
-    /**
-     * @expectedException \Cybits\Elbish\Exception\GeneralException
-     */
-    public function testNewPostCommandIfExists()
-    {
-        chdir($this->examplePath . "/posts");
-        if (!file_exists('__example__.md')) {
-            touch('__example__.md');
-        }
-        $app = new Elbish\Application();
-        $command = $app->find('new-post');
-
-        $cmdTester = new CommandTester($command);
-
-        try {
-            $cmdTester->execute(
-                array(
-                    'command' => $command->getName(),
-                    'filename' => "__example__",
-                    'title' => "Test post",
-                    'ext' => 'md'
-                )
-            );
-        } catch (\Exception $e) {
-            @unlink('__example__.md');
-            throw $e;
-        }
     }
 }

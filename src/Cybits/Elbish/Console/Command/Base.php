@@ -13,11 +13,8 @@ use Symfony\Component\Console\Command\Command;
  */
 class Base extends Command
 {
-    protected function getPattern($pattern,$time = null, array $overwrite = array())
+    protected function getPattern($pattern, $time, array $overwrite = array())
     {
-        if (!$time) {
-            $time = time();
-        }
         $date = date('y-m-d-H-i-s', $time);
         $date = explode('-', $date);
         $source = array (

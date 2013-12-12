@@ -5,7 +5,7 @@ namespace Cybits\Elbish\Parser;
 use Cybits\Elbish\Exception\NotSupported;
 use RomaricDrigon\MetaYaml\MetaYaml;
 
-abstract class Base implements \ArrayAccess
+abstract class Base implements \ArrayAccess, \IteratorAggregate
 {
     /** @var  array */
     protected $data;
@@ -13,7 +13,7 @@ abstract class Base implements \ArrayAccess
     /**
      * Load a file using data
      *
-     * @param array $data loaded data into an array
+     * @param array   $data  loaded data into an array
      * @param boolean $force force validation on data
      */
     public function __construct(array $data, $force = true)
@@ -145,5 +145,16 @@ abstract class Base implements \ArrayAccess
     public function offsetUnset($offset)
     {
         throw new NotSupported();
+    }
+
+
+    /**
+     * Interface to create an external Iterator.
+     *
+     * @link http://php.net/manual/en/class.iteratoraggregate.php
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->data);
     }
 }

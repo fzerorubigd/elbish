@@ -35,17 +35,6 @@ class Application extends \Symfony\Component\Console\Application
         $this->add(new BuildPosts());
     }
 
-    public function doRun(InputInterface $input, OutputInterface $output)
-    {
-        if (!file_exists($this->currentDir . '/config.yaml')) {
-            $output->writeln('<comment>Config file is not available in current directory.</comment>');
-            $this->config = new Config(null);
-        } else {
-            $this->config = new Config($this->currentDir . '/config.yaml');
-        }
-
-        return parent::doRun($input, $output);
-    }
 
     protected function initTwig()
     {
@@ -64,6 +53,15 @@ class Application extends \Symfony\Component\Console\Application
      */
     public function getConfig()
     {
+        if (!$this->config) {
+            if (!file_exists($this->currentDir . '/config.yaml')) {
+                //$output->writeln('<comment>Config file is not available in current directory.</comment>');
+                $this->config = new Config(null);
+            } else {
+                $this->config = new Config($this->currentDir . '/config.yaml');
+            }
+        }
+
         return $this->config;
     }
 
@@ -81,6 +79,7 @@ class Application extends \Symfony\Component\Console\Application
     public function getTwig()
     {
         $this->initTwig();
+
         return $this->twig;
     }
 }
