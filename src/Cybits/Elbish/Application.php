@@ -2,22 +2,22 @@
 
 namespace Cybits\Elbish;
 
-use Cybits\Elbish\Console\Command\BuildPost;
 use Cybits\Elbish\Console\Command\BuildPosts;
 use Cybits\Elbish\Console\Command\NewPost;
-use Cybits\Elbish\Console\Command\Test;
-use Cybits\Elbish\Exception\NotFound;
 use Cybits\Elbish\Parser\Config;
 use Cybits\Elbish\Parser\Post;
 
+/**
+ * Class Application
+ *
+ * @package Cybits\Elbish
+ */
 class Application extends \Symfony\Component\Console\Application
 {
+    protected static $instance;
 
     const VERSION = '0.1.0';
     const APP_NAME = 'elbish, Static publishing system';
-
-    /** @var  string */
-    protected $currentDir;
 
     /** @var Config */
     protected $config;
@@ -34,7 +34,6 @@ class Application extends \Symfony\Component\Console\Application
     public function __construct()
     {
         parent::__construct(self::APP_NAME, self::VERSION);
-        $this->currentDir = getcwd();
 
         $this->add(new NewPost());
         $this->add(new BuildPosts());
@@ -47,6 +46,20 @@ class Application extends \Symfony\Component\Console\Application
     }
 
     /**
+     * Singleton getInstance method
+     *
+     * @return Application
+     */
+    public static function getInstance()
+    {
+        if (!self::$instance) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+    /**
      * Init twig env
      *
      * @deprecated
@@ -55,7 +68,7 @@ class Application extends \Symfony\Component\Console\Application
     {
         if (!$this->twig) {
             $loader = new \Twig_Loader_Filesystem(
-                $this->currentDir . '/' . $this->getConfig()->get('twig.path', 'templates')
+                $this->getCurrentDir() . '/' . $this->getConfig()->get('twig.path', 'templates')
             );
             $this->twig = new \Twig_Environment($loader);
             $this->twig->addGlobal('elbish', $this);
@@ -71,7 +84,7 @@ class Application extends \Symfony\Component\Console\Application
     public function getConfig()
     {
         if (!$this->config) {
-            if (!file_exists($this->currentDir . '/config.yaml')) {
+            if (!file_exists($this->getCurrentDir() . '/config.yaml')) {
                 //$output->writeln('<comment>Config file is not available in current directory.</comment>');
                 $this->config = new Config(array());
             } else {
@@ -89,7 +102,7 @@ class Application extends \Symfony\Component\Console\Application
      */
     public function getCurrentDir()
     {
-        return $this->currentDir;
+        return getcwd();
     }
 
     /**

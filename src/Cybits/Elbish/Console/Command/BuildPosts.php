@@ -43,7 +43,7 @@ class BuildPosts extends Base
     protected function saveCache()
     {
         $cacheDir = $this->getApplication()->getCurrentDir() . '/' .
-            $this->getApplication()->getConfig()->get('site.cache_dir', '.cache');
+            $this->getApplication()->getConfig()->get('site.cache_dir', '_cache');
         try {
             if (!is_dir($cacheDir)) {
                 @mkdir($cacheDir, 0777, true);
