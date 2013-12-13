@@ -15,6 +15,8 @@ class Post extends Base
 {
     protected $text;
 
+    protected $fileName;
+
     /**
      * Load a front matter file, if this class not support that file has any problem then
      * the result is false.
@@ -28,7 +30,7 @@ class Post extends Base
         if (!$this->isSupported($fileName)) {
             return false;
         }
-
+        $this->fileName = $fileName;
         try {
             $frontMatter = FrontMatter::parse($fileName);
             $this->text = $frontMatter['text'];
@@ -75,5 +77,21 @@ class Post extends Base
     {
         // This default support every file type, so work as a fallback.
         return file_exists($fileName);
+    }
+
+    /**
+     * Get the post date, base on meta data or file ctime
+     *
+     * @return int timestap
+     */
+    public function getDate()
+    {
+        if (isset($this['date'])) {
+            return strtotime($this['date']);
+        } else {
+            $file = new \SplFileInfo($this->fileName);
+            // Try to load it from file time, not a good way, but what can I do??
+            return $file->getCTime();
+        }
     }
 }

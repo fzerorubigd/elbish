@@ -3,6 +3,7 @@
 namespace Cybits\Elbish\Console\Command;
 
 
+use Cybits\Elbish\Parser\Post;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -71,6 +72,36 @@ EOT
     }
 
     /**
+     * Get target file for a post
+     *
+     * @param Post         $post post object
+     * @param \SplFileInfo $file post file
+     *
+     * @return array|string
+     */
+    private function getTargetFolder(Post $post, \SplFileInfo $file)
+    {
+        $target = $this->getApplication()->getConfig()->get('site.post_url', ':year/:month/:slug');
+        $noExt = $this->getApplication()->getConfig()->get('site.no_ext', true);
+
+        $overwrite = array(':slug' => $file->getBasename('.' . $file->getExtension()));
+
+        foreach ($post as $key => $value) {
+            if (is_scalar($value)) {
+                $overwrite[':' . $key] = $value;
+            }
+        }
+        $target = $this->getPattern($target, $post->getDate(), $overwrite);
+        if ($noExt) {
+            $target .= '/index.html';
+        } else {
+            $target .= '.html';
+        }
+
+        return $target;
+    }
+
+    /**
      * Process a file
      *
      * @param SplFileInfo $file         file data
@@ -86,28 +117,7 @@ EOT
         //TODO : Template plugin to use other type of markups, like mustache or handlebars
         $result = $twig->render('post.twig', array('post' => $post));
 
-        $target = $this->getApplication()->getConfig()->get('site.post_url', ':year/:month/:slug');
-        $noExt = $this->getApplication()->getConfig()->get('site.no_ext', true);
-
-        $overwrite = array(':slug' => $file->getBasename('.' . $file->getExtension()));
-        if (isset($post['date'])) {
-            $date = strtotime($post['date']);
-        } else {
-            // Try to load it from file time, not a good way, but what can I do??
-            $date = $file->getCTime();
-        }
-        foreach ($post as $key => $value) {
-            if (is_scalar($value)) {
-                $overwrite[':' . $key] = $value;
-            }
-        }
-        $target = $targetFolder . '/' . $this->getPattern($target, $date, $overwrite);
-        if ($noExt) {
-            $target .= '/index.html';
-        } else {
-            $target .= '.html';
-        }
-
+        $target = $targetFolder . '/' . $this->getTargetFolder($post, $file);
         if (!is_dir(dirname($target))) {
             mkdir(dirname($target), 0777, true);
         }

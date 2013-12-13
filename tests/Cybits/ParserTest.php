@@ -65,6 +65,14 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($post->loadFrontMatter($this->examplePath . "/config.yaml"));
         $this->assertFalse($post->loadFrontMatter($this->examplePath . "/config.md"));
+    }
 
+    public function testPostDate()
+    {
+        $post = new Post();
+        $this->assertTrue($post->loadFrontMatter($this->examplePath . "/posts/example.md"));
+        $this->assertEquals(strtotime($post['date']), $post->getDate());
+        $this->assertTrue($post->loadFrontMatter($this->examplePath . "/posts/example-no-date.md"));
+        $this->assertEquals(filectime($this->examplePath . "/posts/example-no-date.md"), $post->getDate());
     }
 }
