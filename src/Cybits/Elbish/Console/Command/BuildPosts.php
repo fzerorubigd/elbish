@@ -10,14 +10,22 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Class BuildPosts
+ *
+ * @package Cybits\Elbish\Console\Command
+ */
 class BuildPosts extends Base
 {
     protected $cache = array();
 
+    /**
+     * Try to load cache
+     */
     protected function loadCache()
     {
         $cacheDir = $this->getApplication()->getCurrentDir() . '/' .
-            $this->getApplication()->getConfig()->get('site.cache_dir', '.cache');
+            $this->getApplication()->getConfig()->get('site.cache_dir', '_cache');
 
         if (is_readable($cacheDir . '/posts.cache.yaml')) {
             try {
@@ -28,6 +36,9 @@ class BuildPosts extends Base
         }
     }
 
+    /**
+     * Try to save cache
+     */
     protected function saveCache()
     {
         $cacheDir = $this->getApplication()->getCurrentDir() . '/' .
@@ -43,6 +54,9 @@ class BuildPosts extends Base
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this->setName("build-posts")
@@ -56,9 +70,16 @@ EOT
             );
     }
 
+    /**
+     * Process a file
+     *
+     * @param SplFileInfo $file         file data
+     * @param string      $targetFolder target folder to save the result into
+     *
+     * @return bool
+     */
     private function processFile(SplFileInfo $file, $targetFolder)
     {
-        $identifier = md5($file->getRealPath()); // :)
         $post = $this->getApplication()->getParserForFile($file->getRealPath());
         $post->loadFrontMatter($file->getRealPath());
         $twig = $this->getApplication()->getTwig();
@@ -92,18 +113,41 @@ EOT
         }
 
         file_put_contents($target, $result);
-        $this->cache[$identifier]['target'] = $target;
-        $this->cache[$identifier]['target_md5'] = md5_file($target);
+        $this->addDataToCache($file->getRealPath(), 'target', $target);
+        $this->addDataToCache($file->getRealPath(), 'target_md5', md5_file($target));
 
         return true;
     }
 
-    private function isCached(SplFileInfo $file, $force)
+    /**
+     * Add data to cache
+     *
+     * @param string $fileName file name
+     * @param string $data     sting data key
+     * @param string $value    value of key
+     */
+    protected function addDataToCache($fileName, $data, $value)
+    {
+        $identifier = md5($fileName);
+        if (!isset($this->cache[$identifier])) {
+            $this->cache[$identifier] = array();
+        }
+        $this->cache[$identifier][$data] = $value;
+    }
+
+    /**
+     * Is this file has a valid cache or not?
+     *
+     * @param SplFileInfo $file file info
+     *
+     * @return bool
+     */
+    private function isCached(SplFileInfo $file)
     {
         // For now all files are markdown files
         $hash = md5_file($file->getRealPath());
         $identifier = md5($file->getRealPath()); // :)
-        if (isset($this->cache[$identifier]) && !$force) {
+        if (isset($this->cache[$identifier])) {
             $data = $this->cache[$identifier];
             if (isset($data['md5']) &&
                 isset($data['target']) &&
@@ -115,11 +159,13 @@ EOT
                 return true;
             }
         }
-        $this->cache[$identifier] = array('md5' => $hash);
 
         return false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $force = $input->getOption('force');
@@ -135,10 +181,11 @@ EOT
         /** @var $file SplFileInfo */
         foreach ($finder as $file) {
             $output->write('<info>Processing ' . $file->getFilename() . '</info> ');
-            if ($this->isCached($file, $force)) {
+            if (!$force && $this->isCached($file)) {
                 $output->writeln(' .... <info>File has no change. skipping</info>');
             } else {
                 $this->processFile($file, $targetFolder);
+                $this->addDataToCache($file->getRealPath(), 'md5', md5_file($file->getRealPath()));
                 $output->writeln(' .... <info>DONE</info>');
             }
         }

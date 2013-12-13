@@ -2,15 +2,17 @@
 
 namespace Cybits\Elbish\Parser\Post;
 
-
 use Cybits\Elbish\Parser\Post;
 
+/**
+ * Class Markdown
+ *
+ * @package Cybits\Elbish\Parser\Post
+ */
 class Markdown extends Post
 {
     /**
-     * Get the transformed text part of front matter
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getText()
     {
@@ -18,9 +20,7 @@ class Markdown extends Post
     }
 
     /**
-     * @param $fileName
-     *
-     * @return bool if the file is supported then load is happen here
+     * {@inheritdoc}
      */
     public function isSupported($fileName)
     {

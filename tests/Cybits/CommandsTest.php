@@ -102,8 +102,7 @@ class CommandsTest extends \PHPUnit_Framework_TestCase
 
         $cmdTester->execute(
             array(
-                'command' => $command->getName(),
-                '--force' => true
+                'command' => $command->getName()
             )
         );
 
@@ -120,7 +119,15 @@ class CommandsTest extends \PHPUnit_Framework_TestCase
                 '--force' => true
             )
         );
+        $this->assertContains("Processing example.md  .... DONE", $cmdTester->getDisplay());
+        //Make the cache invalid
+        file_put_contents('_cache/posts.cache.yaml', "Invalid\n yaml\n\t file");
+        $cmdTester->execute(
+            array(
+                'command' => $command->getName()
+            )
+        );
 
         $this->assertContains("Processing example.md  .... DONE", $cmdTester->getDisplay());
     }
-} 
+}

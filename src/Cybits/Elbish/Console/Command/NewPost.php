@@ -11,8 +11,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Class NewPost
+ *
+ * @package Cybits\Elbish\Console\Command
+ */
 class NewPost extends Base
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this->setName("new-post")
@@ -21,12 +29,16 @@ class NewPost extends Base
             ->addArgument('filename', InputArgument::REQUIRED, 'Target file to create')
             ->addArgument('ext', InputArgument::REQUIRED, 'extension of file to create')
             ->addArgument('title', InputArgument::OPTIONAL, 'Title of post')
-            ->setHelp(<<<EOT
+            ->setHelp(
+                <<<EOT
 Create new post file with ext and title
 EOT
             );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var $app Application */

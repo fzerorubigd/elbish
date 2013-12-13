@@ -14,14 +14,16 @@ use Symfony\Component\Yaml\Yaml;
 class Config extends Base
 {
     /**
-     * @param string $configFile config file path
+     * Create a new config base on file or config array
+     *
+     * @param string|array $config config file path or loaded config
      */
-    public function __construct($configFile)
+    public function __construct($config = array())
     {
-        if (file_exists($configFile)) {
-            $this->loadData(Yaml::parse($configFile));
+        if (is_string($config) && file_exists($config)) {
+            $this->loadData(Yaml::parse($config));
         } else {
-            $this->loadData(array(), false);
+            $this->loadData((array)$config, false);
         }
     }
 

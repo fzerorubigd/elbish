@@ -28,6 +28,9 @@ class Application extends \Symfony\Component\Console\Application
     /** @var  Parser\Post[] */
     protected $parsers = array();
 
+    /**
+     * Create new application and add default command and parsers to it
+     */
     public function __construct()
     {
         parent::__construct(self::APP_NAME, self::VERSION);
@@ -43,7 +46,11 @@ class Application extends \Symfony\Component\Console\Application
         $this->registerParser(new Post\Markdown());
     }
 
-
+    /**
+     * Init twig env
+     *
+     * @deprecated
+     */
     protected function initTwig()
     {
         if (!$this->twig) {
@@ -57,6 +64,8 @@ class Application extends \Symfony\Component\Console\Application
     }
 
     /**
+     * Get current application config
+     *
      * @return Config
      */
     public function getConfig()
@@ -64,7 +73,7 @@ class Application extends \Symfony\Component\Console\Application
         if (!$this->config) {
             if (!file_exists($this->currentDir . '/config.yaml')) {
                 //$output->writeln('<comment>Config file is not available in current directory.</comment>');
-                $this->config = new Config(null);
+                $this->config = new Config(array());
             } else {
                 $this->config = new Config($this->currentDir . '/config.yaml');
             }
@@ -74,13 +83,20 @@ class Application extends \Symfony\Component\Console\Application
     }
 
     /**
-     * @return mixed
+     * Get current directory
+     *
+     * @return string
      */
     public function getCurrentDir()
     {
         return $this->currentDir;
     }
 
+    /**
+     * Register a new parser object
+     *
+     * @param Post $parser the parser object
+     */
     public function registerParser(Post $parser)
     {
         array_unshift($this->parsers, $parser);
@@ -107,7 +123,10 @@ class Application extends \Symfony\Component\Console\Application
     }
 
     /**
+     * Get template env.
+     *
      * @return \Twig_Environment
+     * @deprecated
      */
     public function getTwig()
     {

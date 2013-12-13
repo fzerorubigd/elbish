@@ -5,6 +5,11 @@ namespace Cybits\Elbish\Parser;
 use Cybits\Elbish\Exception\NotSupported;
 use RomaricDrigon\MetaYaml\MetaYaml;
 
+/**
+ * Class Base
+ *
+ * @package Cybits\Elbish\Parser
+ */
 abstract class Base implements \ArrayAccess, \IteratorAggregate
 {
     /** @var  array */
@@ -55,6 +60,13 @@ abstract class Base implements \ArrayAccess, \IteratorAggregate
         return $current;
     }
 
+    /**
+     * Is this file has the offset or not, identical to offsetExists
+     *
+     * @param string $offset offset to check
+     *
+     * @return bool
+     */
     public function has($offset)
     {
         $parts = explode('.', $offset);
@@ -71,19 +83,14 @@ abstract class Base implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Whether a offset exists
      *
-     * @link http://php.net/manual/en/arrayaccess.offsetexists.php
-     *
-     * @param mixed $offset <p>
-     *                      An offset to check for.
-     *                      </p>
+     * @param mixed $offset An offset to check for.
      *
      * @return boolean true on success or false on failure.
-     * </p>
-     * <p>
      * The return value will be casted to boolean if non-boolean was returned.
+     *
+     * @link http://php.net/manual/en/arrayaccess.offsetexists.php
      */
     public function offsetExists($offset)
     {
@@ -91,16 +98,13 @@ abstract class Base implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Offset to retrieve
      *
-     * @link http://php.net/manual/en/arrayaccess.offsetget.php
-     *
-     * @param mixed $offset <p>
-     *                      The offset to retrieve.
-     *                      </p>
+     * @param mixed $offset The offset to retrieve.
      *
      * @return mixed Can return all value types.
+     *
+     * @link http://php.net/manual/en/arrayaccess.offsetget.php
      */
     public function offsetGet($offset)
     {
@@ -108,20 +112,15 @@ abstract class Base implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Offset to set
      *
-     * @link http://php.net/manual/en/arrayaccess.offsetset.php
-     *
-     * @param mixed $offset <p>
-     *                      The offset to assign the value to.
-     *                      </p>
-     * @param mixed $value  <p>
-     *                      The value to set.
-     *                      </p>
+     * @param mixed $offset The offset to assign the value to.
+     * @param mixed $value  The value to set.
      *
      * @throws \Cybits\Elbish\Exception\NotSupported
      * @return void
+     *
+     * @link http://php.net/manual/en/arrayaccess.offsetset.php
      */
     public function offsetSet($offset, $value)
     {
@@ -129,17 +128,14 @@ abstract class Base implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Offset to unset
      *
-     * @link http://php.net/manual/en/arrayaccess.offsetunset.php
-     *
-     * @param mixed $offset <p>
-     *                      The offset to unset.
-     *                      </p>
+     * @param mixed $offset The offset to unset.
      *
      * @throws \Cybits\Elbish\Exception\NotSupported
      * @return void
+     *
+     * @link http://php.net/manual/en/arrayaccess.offsetunset.php
      */
     public function offsetUnset($offset)
     {
@@ -150,6 +146,7 @@ abstract class Base implements \ArrayAccess, \IteratorAggregate
     /**
      * Interface to create an external Iterator.
      *
+     * @return \Iterator
      * @link http://php.net/manual/en/class.iteratoraggregate.php
      */
     public function getIterator()

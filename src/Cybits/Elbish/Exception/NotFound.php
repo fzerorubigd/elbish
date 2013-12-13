@@ -2,6 +2,11 @@
 
 namespace Cybits\Elbish\Exception;
 
-class NotFound extends \Exception{
-
-} 
+/**
+ * Class NotFound
+ *
+ * @package Cybits\Elbish\Exception
+ */
+class NotFound extends \Exception
+{
+}

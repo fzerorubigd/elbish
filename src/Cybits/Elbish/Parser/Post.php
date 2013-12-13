@@ -15,6 +15,14 @@ class Post extends Base
 {
     protected $text;
 
+    /**
+     * Load a front matter file, if this class not support that file has any problem then
+     * the result is false.
+     *
+     * @param string $fileName file name to load
+     *
+     * @return bool
+     */
     public function loadFrontMatter($fileName)
     {
         if (!$this->isSupported($fileName)) {
@@ -22,9 +30,9 @@ class Post extends Base
         }
 
         try {
-            $fm = FrontMatter::parse($fileName);
-            $this->text = $fm['text'];
-            $this->loadData($fm['yaml']);
+            $frontMatter = FrontMatter::parse($fileName);
+            $this->text = $frontMatter['text'];
+            $this->loadData($frontMatter['yaml']);
         } catch (\Exception $e) {
             return false;
         }
@@ -57,13 +65,15 @@ class Post extends Base
     }
 
     /**
-     * @param $fileName
+     * Is this file supported with this parser or not.
+     *
+     * @param string $fileName file name to load
      *
      * @return bool if the file is supported then load is happen here
      */
     public function isSupported($fileName)
     {
         // This default support every file type, so work as a fallback.
-        return true;
+        return file_exists($fileName);
     }
 }
