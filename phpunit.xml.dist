@@ -3,7 +3,7 @@
 <phpunit bootstrap="tests/bootstrap.php" colors="true">
     <testsuites>
         <testsuite name="Elbish Test suite">
-            <directory>tests/</directory>
+            <directory>tests/Cybits</directory>
         </testsuite>
     </testsuites>
 
