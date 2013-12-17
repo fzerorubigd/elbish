@@ -18,10 +18,18 @@ class PluginLoaderTest extends \PHPUnit_Framework_TestCase
         file_put_contents($fileName, $code);
         $loader = new Loader();
 
-        $this->assertEquals(
-            $loader->loadPlugins($directory),
-            array ($fileName => $classes)
-        );
+        $result = $loader->loadPlugins($directory);
+        $this->assertArrayHasKey($fileName, $result);
+        $this->assertEquals(1, count($result));
+        if ($classes !== false) {
+            foreach ($classes as $class) {
+                $this->assertArrayHasKey($class, $result[$fileName]);
+                $this->assertInstanceOf($class, $result[$fileName][$class]);
+            }
+        } else {
+            $this->assertFalse($result[$fileName]);
+        }
+
         @unlink($fileName);
         rmdir($directory);
     }
@@ -32,11 +40,12 @@ class PluginLoaderTest extends \PHPUnit_Framework_TestCase
         return array (
             array("<?php class TestClass{} ", array("\\TestClass")),
             array("<?php namespace Test; class TestClass{} ", array("\\Test\\TestClass")),
-            array("<?php namespace Test { class TestClass{} }", array("\\Test\\TestClass")),
+            array("<?php namespace Test { class AnotherTestClass{} }", array("\\Test\\AnotherTestClass")),
             array("<?php namespace Test; function x(){};", array()),
             array("<?php namespace Test; wrong!;", false),
-            array("<?php namespace {class Test{}}
-            namespace Test { class TestClass{} }", array("\\Test", "\\Test\\TestClass")),
+            array("<?php namespace " . __NAMESPACE__ . ";\n class PluginLoaderTest{}", false),
+            array("<?php namespace {class ATest{}}
+            namespace Test { class ATestClass{} }", array("\\ATest", "\\Test\\ATestClass")),
         );
     }
 }

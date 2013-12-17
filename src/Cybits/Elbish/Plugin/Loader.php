@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: f0rud
- * Date: 12/13/13
- * Time: 4:59 PM
- */
 
 namespace Cybits\Elbish\Plugin;
 
@@ -37,7 +31,12 @@ class Loader
             try {
                 $data = $parser->parse($file->getContents());
 
-                $result[$file->getRealPath()] = $this->findClasses($data);
+                $classes = $this->findClasses($data);
+                foreach ($classes as $class => &$object) {
+                    $object = $this->safeLoadClasses($class, $file->getRealPath());
+                }
+                $result[$file->getRealPath()] = $classes;
+
             } catch (\Exception $e) {
                 $result[$file->getRealPath()] = false;
             }
@@ -66,10 +65,35 @@ class Loader
                 }
                 $classes = array_merge($classes, $this->findClasses($node->stmts, $newPrefix));
             } elseif ($node->getType() == 'Stmt_Class') {
-                $classes[] = $prefix . '\\' . $node->name;
+                $class = $prefix . '\\' . $node->name;
+                if (class_exists($class)) {
+                    return false;
+                } else {
+                    $classes[$prefix . '\\' . $node->name] = true;
+                }
             }
         }
 
         return $classes;
+    }
+
+    /**
+     * Load a plugin class
+     *
+     * @param string $className class name to create
+     * @param string $fileName  filename to load
+     *
+     * @return mixed
+     */
+    private function safeLoadClasses($className, $fileName)
+    {
+        if (!class_exists($className)) {
+            // Maybe require_once and then throw an exception on error
+            require($fileName);
+        }
+
+        $reflection = new \ReflectionClass($className);
+
+        return $reflection->newInstance();
     }
 }
