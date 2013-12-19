@@ -44,15 +44,15 @@ class BuildPosts extends Base
     {
         $cacheDir = $this->getApplication()->getCurrentDir() . '/' .
             $this->getApplication()->getConfig()->get('site.cache_dir', '_cache');
-        try {
-            if (!is_dir($cacheDir)) {
-                @mkdir($cacheDir, 0777, true);
-            }
-            file_put_contents($cacheDir . '/posts.cache.yaml', Yaml::dump($this->cache));
-        } catch (\Exception $e) {
-            //TODO : change php warnings to error
-            // :/ do nothing.
+        //try {
+        if (!is_dir($cacheDir)) {
+            @mkdir($cacheDir, 0777, true);
         }
+        file_put_contents($cacheDir . '/posts.cache.yaml', Yaml::dump($this->cache));
+        //} catch (\Exception $e) {
+        //TODO : change php warnings to error
+        // :/ do nothing.
+        //}
     }
 
     /**

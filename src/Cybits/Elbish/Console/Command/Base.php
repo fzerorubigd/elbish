@@ -3,13 +3,14 @@
 namespace Cybits\Elbish\Console\Command;
 
 
-use Cybits\Elbish\Application;
 use Symfony\Component\Console\Command\Command;
 
 /**
  * Class Base
  *
- * @package Cybits\Elbish\Console\Command
+ * @package Cybits\Elbish\Console\
+ *
+ * @method \Cybits\Elbish\Application getApplication() return current application
  */
 class Base extends Command
 {
@@ -37,15 +38,5 @@ class Base extends Command
         $source = array_merge($source, $overwrite);
 
         return strtr($pattern, $source);
-    }
-
-    /**
-     * A simple function to add auto-complete ability to getApplication calls
-     *
-     * @return Application
-     */
-    public function getApplication()
-    {
-        return parent::getApplication();
     }
 }

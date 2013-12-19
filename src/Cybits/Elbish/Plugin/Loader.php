@@ -37,7 +37,7 @@ class Loader
                 $classes = $this->findClasses($file->getRealPath(), $data);
                 $result = array_merge($result, $classes);
             } catch (\Exception $e) {
-                //Do nothing
+                continue; // Why some tools such as phpmd detect empty catch as a problem?
             }
         }
 
