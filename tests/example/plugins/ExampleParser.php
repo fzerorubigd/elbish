@@ -22,7 +22,7 @@ class ExampleParser extends Post
     /**
      * {@inheritdoc}
      */
-    public function isSupported($fileName)
+    public static function isSupported($fileName)
     {
         $info = pathinfo($fileName);
         $ext = strtolower($info['extension']);

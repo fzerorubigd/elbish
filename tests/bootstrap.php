@@ -10,21 +10,19 @@ namespace Testing;
  */
 class TestingBootstrap
 {
-    protected static $autoloader = null;
+    protected static $autoLoader = null;
 
     /**
      * Get composer auto loader
      *
-     * @return mixed
+     * @return \Composer\Autoload\ClassLoader
      */
     public static function getLoader()
     {
-        if (!self::$autoloader) {
-            self::$autoloader = include __DIR__ . "/../vendor/autoload.php";
+        if (!self::$autoLoader) {
+            self::$autoLoader = include __DIR__ . "/../vendor/autoload.php";
         }
 
-        return self::$autoloader;
+        return self::$autoLoader;
     }
 }
-
-

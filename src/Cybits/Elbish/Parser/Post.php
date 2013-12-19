@@ -73,7 +73,7 @@ class Post extends Base
      *
      * @return bool if the file is supported then load is happen here
      */
-    public function isSupported($fileName)
+    public static function isSupported($fileName)
     {
         // This default support every file type, so work as a fallback.
         return file_exists($fileName);

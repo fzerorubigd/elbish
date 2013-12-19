@@ -9,7 +9,6 @@ use Testing\TestingBootstrap;
 class PluginLoaderTest extends \PHPUnit_Framework_TestCase
 {
 
-
     private $examplePath;
 
     public function setUp()
@@ -32,15 +31,13 @@ class PluginLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new Loader();
 
         $result = $loader->loadPlugins($directory);
-        $this->assertArrayHasKey($fileName, $result);
-        $this->assertEquals(1, count($result));
-        if ($classes !== false) {
+        if ($classes) {
             foreach ($classes as $class) {
-                $this->assertArrayHasKey($class, $result[$fileName]);
-                $this->assertInstanceOf($class, $result[$fileName][$class]);
+                $this->assertArrayHasKey($class, $result);
+                $this->assertEquals($fileName, $result[$class]);
             }
         } else {
-            $this->assertFalse($result[$fileName]);
+            $this->assertEquals($result, array());
         }
 
         @unlink($fileName);
@@ -59,15 +56,15 @@ class PluginLoaderTest extends \PHPUnit_Framework_TestCase
     public function codeProvider()
     {
         return array(
-            array("<?php class TestClass{} ", array("\\TestClass")),
+            array("<?php class TestClass{} ", array("TestClass")),
             array("<?php namespace Test;use Cybits\\Elbish\\Parser\\Post;
-            class TestClass extends Post{} ", array("\\Test\\TestClass")),
-            array("<?php namespace Test { class AnotherTestClass{} }", array("\\Test\\AnotherTestClass")),
+            class TestClass extends Post{} ", array("Test\\TestClass")),
+            array("<?php namespace Test { class AnotherTestClass{} }", array("Test\\AnotherTestClass")),
             array("<?php namespace Test; function x(){};", array()),
             array("<?php namespace Test; wrong!;", false),
             array("<?php namespace " . __NAMESPACE__ . ";\n class PluginLoaderTest{}", false),
             array("<?php namespace {class ATest{}}
-            namespace Test { class ATestClass{} }", array("\\ATest", "\\Test\\ATestClass")),
+            namespace Test { class ATestClass{} }", array("ATest", "Test\\ATestClass")),
         );
     }
 
@@ -75,7 +72,7 @@ class PluginLoaderTest extends \PHPUnit_Framework_TestCase
     {
         chdir($this->examplePath);
 
-        $app = Elbish\Application::createInstance();
+        $app = Elbish\Application::createInstance(TestingBootstrap::getLoader());
 
         $this->assertInstanceOf('\Cybits\Elbish\Plugin\Loader', $app->getPluginLoader());
         $this->assertTrue(class_exists('\\ExampleParser\\ExampleParser'));

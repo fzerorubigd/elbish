@@ -2,6 +2,7 @@
 
 namespace Cybits\Elbish;
 
+use Composer\Autoload\ClassLoader;
 use Cybits\Elbish\Console\Command\BuildPosts;
 use Cybits\Elbish\Console\Command\NewPost;
 use Cybits\Elbish\Parser\Config;
@@ -23,26 +24,32 @@ class Application extends \Symfony\Component\Console\Application
     /** @var  \Twig_Environment */
     protected $twig;
 
-    /** @var  Parser\Post[] */
+    /** @var  \ReflectionClass[] */
     protected $parsers = array();
 
     /** @var  Plugin\Loader */
     protected $pluginLoader;
 
+    /** @var  ClassLoader */
+    protected $classLoader;
+
     /**
      * Create new application and add default command and parsers to it
+     *
+     * @param ClassLoader $classLoader composer loader class to use with plugins
      */
-    public function __construct()
+    public function __construct(ClassLoader $classLoader)
     {
         parent::__construct(self::APP_NAME, self::VERSION);
+        $this->classLoader = $classLoader;
 
         $this->add(new NewPost());
         $this->add(new BuildPosts());
 
         // Register default parsers
         // Post parser is available if there is no other parser is there
-        $this->registerParser(new Post());
-        $this->registerParser(new Post\Markdown());
+        $this->registerParser(new \ReflectionClass('\Cybits\Elbish\Parser\Post'));
+        $this->registerParser(new \ReflectionClass('\Cybits\Elbish\Parser\Post\Markdown'));
 
         $this->pluginLoader = new Plugin\Loader();
         $dir = $this->getCurrentDir() . '/' . $this->getConfig()->get('site.plugin_dir', 'plugins');
@@ -60,15 +67,13 @@ class Application extends \Symfony\Component\Console\Application
     protected function loadPlugins($directory)
     {
         $plugins = $this->pluginLoader->loadPlugins($directory);
-        foreach ($plugins as &$classes) {
-            if ($classes) {
-                foreach ($classes as $key => $class) {
-                    if ($class instanceof Post) {
-                        $this->registerParser($class);
-                    } else {
-                        unset($classes[$key]);
-                    }
-                }
+        //Add them to composer class map auto-loader
+        $this->getClassLoader()->addClassMap($plugins);
+
+        foreach (array_keys($plugins) as $class) {
+            $reflection = new \ReflectionClass('\\' . $class);
+            if ($reflection->isSubclassOf('\Cybits\Elbish\Parser\Post')) {
+                $this->registerParser($reflection);
             }
         }
     }
@@ -76,11 +81,13 @@ class Application extends \Symfony\Component\Console\Application
     /**
      * Singleton getInstance method
      *
+     * @param \Composer\Autoload\ClassLoader $classLoader current composer class loader
+     *
      * @return Application
      */
-    public static function createInstance()
+    public static function createInstance(ClassLoader $classLoader)
     {
-        return new self();
+        return new self($classLoader);
     }
 
     /**
@@ -132,9 +139,9 @@ class Application extends \Symfony\Component\Console\Application
     /**
      * Register a new parser object
      *
-     * @param Post $parser the parser object
+     * @param \ReflectionClass $parser the parser object
      */
-    public function registerParser(Post $parser)
+    public function registerParser(\ReflectionClass $parser)
     {
         array_unshift($this->parsers, $parser);
     }
@@ -150,10 +157,14 @@ class Application extends \Symfony\Component\Console\Application
     {
         $result = null;
         foreach ($this->parsers as $parser) {
-            if ($parser->isSupported($filename)) {
-                $result = $parser;
+            $isSupported = $parser->getMethod('isSupported');
+            if ($isSupported->isStatic() && $isSupported->invoke(null, $filename)) {
+                $result = $parser->newInstance();
                 break;
             }
+        }
+        if (!$result) {
+            $result = new Post();
         }
 
         return $result;
@@ -180,5 +191,15 @@ class Application extends \Symfony\Component\Console\Application
     public function getPluginLoader()
     {
         return $this->pluginLoader;
+    }
+
+    /**
+     * Get current composer class loader
+     *
+     * @return \Composer\Autoload\ClassLoader
+     */
+    public function getClassLoader()
+    {
+        return $this->classLoader;
     }
 }

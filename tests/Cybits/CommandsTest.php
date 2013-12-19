@@ -31,7 +31,7 @@ class CommandsTest extends \PHPUnit_Framework_TestCase
             @unlink('__/__example__.md');
             @rmdir('__');
         }
-        $app = Elbish\Application::createInstance();
+        $app = Elbish\Application::createInstance(TestingBootstrap::getLoader());
         $this->assertInstanceOf('\\Cybits\\Elbish\\Parser\\Config', $app->getConfig());
         $command = $app->find('new-post');
 
@@ -61,7 +61,7 @@ class CommandsTest extends \PHPUnit_Framework_TestCase
         if (!file_exists('__example__.md')) {
             touch('__example__.md');
         }
-        $app = Elbish\Application::createInstance();
+        $app = Elbish\Application::createInstance(TestingBootstrap::getLoader());
         $command = $app->find('new-post');
 
         $cmdTester = new CommandTester($command);
@@ -105,7 +105,7 @@ class CommandsTest extends \PHPUnit_Framework_TestCase
         $this->delTree('_cache');
         $this->delTree('_target');
 
-        $app = Elbish\Application::createInstance();
+        $app = Elbish\Application::createInstance(TestingBootstrap::getLoader());
         $command = $app->find('build-posts');
 
         $cmdTester = new CommandTester($command);

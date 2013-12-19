@@ -35,13 +35,9 @@ class Loader
                 $data = $parser->parse($file->getContents());
 
                 $classes = $this->findClasses($file->getRealPath(), $data);
-                foreach ($classes as $class => &$object) {
-                    $object = $this->safeLoadClasses($class, $file->getRealPath());
-                }
-                $result[$file->getRealPath()] = $classes;
-
+                $result = array_merge($result, $classes);
             } catch (\Exception $e) {
-                $result[$file->getRealPath()] = false;
+                //Do nothing
             }
         }
 
@@ -59,24 +55,18 @@ class Loader
      */
     private function findClasses($fileName, $data, $prefix = '')
     {
+        //The return value is valid for no namespace use, but here we are
+        //in a namespace so beware of that
         $classes = array();
         foreach ($data as $node) {
-            if ($node->getType() == 'Stmt_Namespace') {
-                if ($node->name != '') {
-                    $newPrefix = $prefix . '\\' . $node->name;
-                } else {
-                    $newPrefix = $prefix . $node->name;
-                }
+            if ($node instanceof \PHPParser_Node_Stmt_Namespace) {
+                $newPrefix = $node->name;
                 $classes = array_merge($classes, $this->findClasses($fileName, $node->stmts, $newPrefix));
-            } elseif ($node->getType() == 'Stmt_Class') {
-                $class = $prefix . '\\' . $node->name;
-                if (class_exists($class)) {
-                    $reflection = new \ReflectionClass($class);
-                    if ($reflection->getFileName() != $fileName) {
-                        return false;
-                    }
+            } elseif ($node instanceof \PHPParser_Node_Stmt_Class) {
+                $class = $this->getClassName($fileName, $prefix, $node->name);
+                if ($class) {
+                    $classes[$class] = $fileName;
                 }
-                $classes[$prefix . '\\' . $node->name] = true;
             }
         }
 
@@ -84,22 +74,28 @@ class Loader
     }
 
     /**
-     * Load a plugin class
+     * Get class name
      *
-     * @param string $className class name to create
-     * @param string $fileName  filename to load
+     * @param string $fileName filename to check
+     * @param string $prefix   prefix of class
+     * @param string $name     class name
      *
-     * @return mixed
+     * @return false|string class name or false on failure
      */
-    private function safeLoadClasses($className, $fileName)
+    private function getClassName($fileName, $prefix, $name)
     {
-        if (!in_array($fileName, get_included_files())) {
-            // Maybe require_once and then throw an exception on error
-            require($fileName);
+        if ($prefix) {
+            $class = $prefix . '\\' . $name;
+        } else {
+            $class = $name;
+        }
+        if (class_exists("\\" . $class)) {
+            $reflection = new \ReflectionClass("\\" . $class);
+            if ($reflection->getFileName() != $fileName) {
+                return false;
+            }
         }
 
-        $reflection = new \ReflectionClass($className);
-
-        return $reflection->newInstance();
+        return $class;
     }
 }
