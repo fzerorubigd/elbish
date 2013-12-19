@@ -1,0 +1,8 @@
+---
+title: example post using custom template
+date: 2013/12/02
+extra: data
+data: another thing
+template_engine: fun
+---
+the post

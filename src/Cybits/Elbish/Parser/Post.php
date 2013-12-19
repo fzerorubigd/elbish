@@ -82,7 +82,7 @@ class Post extends Base
     /**
      * Get the post date, base on meta data or file ctime
      *
-     * @return int timestap
+     * @return int timestamp
      */
     public function getDate()
     {
@@ -90,8 +90,24 @@ class Post extends Base
             return strtotime($this['date']);
         } else {
             $file = new \SplFileInfo($this->fileName);
+
             // Try to load it from file time, not a good way, but what can I do??
             return $file->getCTime();
         }
+    }
+
+    /**
+     * Render current post
+     *
+     * @return string
+     */
+    public function render()
+    {
+        $engine = $this->app->getConfig()->get('template.default_engine', 'twig');
+        if ($this['template_engine']) {
+            $engine = $this['template_engine'];
+        }
+
+        return $this->app->getTemplateManager()->getEngine($engine)->renderPost($this);
     }
 }

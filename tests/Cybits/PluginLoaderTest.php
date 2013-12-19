@@ -2,6 +2,7 @@
 
 namespace Cybits;
 
+use Cybits\Elbish\Console\Command\BuildPosts;
 use Cybits\Elbish\Plugin\Loader;
 use Symfony\Component\Console\Tester\CommandTester;
 use Testing\TestingBootstrap;
@@ -73,6 +74,7 @@ class PluginLoaderTest extends \PHPUnit_Framework_TestCase
         chdir($this->examplePath);
 
         $app = Elbish\Application::createInstance(TestingBootstrap::getLoader());
+        $app->add(new BuildPosts());
 
         $this->assertInstanceOf('\Cybits\Elbish\Plugin\Loader', $app->getPluginLoader());
         $this->assertTrue(class_exists('\\ExampleParser\\ExampleParser'));

@@ -6,7 +6,8 @@ use Composer\Autoload\ClassLoader;
 use Cybits\Elbish\Console\Command\BuildPosts;
 use Cybits\Elbish\Console\Command\NewPost;
 use Cybits\Elbish\Parser\Config;
-use Cybits\Elbish\Parser\Post;
+use Cybits\Elbish\Template\Manager as TemplateManager;
+use Cybits\Elbish\Parser\Manager as ParserManager;
 
 /**
  * Class Application
@@ -21,11 +22,11 @@ class Application extends \Symfony\Component\Console\Application
     /** @var Config */
     protected $config;
 
-    /** @var  \Twig_Environment */
-    protected $twig;
+    /** @var   TemplateManager */
+    protected $templateManager;
 
-    /** @var  \ReflectionClass[] */
-    protected $parsers = array();
+    /** @var  ParserManager */
+    protected $parserManager;
 
     /** @var  Plugin\Loader */
     protected $pluginLoader;
@@ -43,14 +44,9 @@ class Application extends \Symfony\Component\Console\Application
         parent::__construct(self::APP_NAME, self::VERSION);
         $this->classLoader = $classLoader;
 
-        $this->add(new NewPost());
-        $this->add(new BuildPosts());
-
+        $this->templateManager = new TemplateManager($this);
+        $this->parserManager = new ParserManager($this);
         // Register default parsers
-        // Post parser is available if there is no other parser is there
-        $this->registerParser(new \ReflectionClass('\Cybits\Elbish\Parser\Post'));
-        $this->registerParser(new \ReflectionClass('\Cybits\Elbish\Parser\Post\Markdown'));
-
         $this->pluginLoader = new Plugin\Loader();
         $dir = $this->getCurrentDir() . '/' . $this->getConfig()->get('site.plugin_dir', 'plugins');
         if (is_dir($dir)) {
@@ -73,7 +69,9 @@ class Application extends \Symfony\Component\Console\Application
         foreach (array_keys($plugins) as $class) {
             $reflection = new \ReflectionClass('\\' . $class);
             if ($reflection->isSubclassOf('\Cybits\Elbish\Parser\Post')) {
-                $this->registerParser($reflection);
+                $this->parserManager->registerPostParser($reflection);
+            } elseif ($reflection->implementsInterface('\Cybits\Elbish\TemplateInterface')) {
+                $this->templateManager->registerEngine($reflection);
             }
         }
     }
@@ -88,23 +86,6 @@ class Application extends \Symfony\Component\Console\Application
     public static function createInstance(ClassLoader $classLoader)
     {
         return new self($classLoader);
-    }
-
-    /**
-     * Init twig env
-     *
-     * @deprecated
-     */
-    protected function initTwig()
-    {
-        if (!$this->twig) {
-            $loader = new \Twig_Loader_Filesystem(
-                $this->getCurrentDir() . '/' . $this->getConfig()->get('twig.path', 'templates')
-            );
-            $this->twig = new \Twig_Environment($loader);
-            $this->twig->addGlobal('elbish', $this);
-            $this->twig->addGlobal('config', $this->getConfig());
-        }
     }
 
     /**
@@ -137,53 +118,6 @@ class Application extends \Symfony\Component\Console\Application
     }
 
     /**
-     * Register a new parser object
-     *
-     * @param \ReflectionClass $parser the parser object
-     */
-    public function registerParser(\ReflectionClass $parser)
-    {
-        array_unshift($this->parsers, $parser);
-    }
-
-    /**
-     * Get the parser for file
-     *
-     * @param string $filename file name to parse
-     *
-     * @return Post
-     */
-    public function getParserForFile($filename)
-    {
-        $result = null;
-        foreach ($this->parsers as $parser) {
-            $isSupported = $parser->getMethod('isSupported');
-            if ($isSupported->isStatic() && $isSupported->invoke(null, $filename)) {
-                $result = $parser->newInstance();
-                break;
-            }
-        }
-        if (!$result) {
-            $result = new Post();
-        }
-
-        return $result;
-    }
-
-    /**
-     * Get template env.
-     *
-     * @return \Twig_Environment
-     * @deprecated
-     */
-    public function getTwig()
-    {
-        $this->initTwig();
-
-        return $this->twig;
-    }
-
-    /**
      * Get current plugin loader
      *
      * @return \Cybits\Elbish\Plugin\Loader
@@ -201,5 +135,25 @@ class Application extends \Symfony\Component\Console\Application
     public function getClassLoader()
     {
         return $this->classLoader;
+    }
+
+    /**
+     * Get current template manager
+     *
+     * @return \Cybits\Elbish\Template\Manager
+     */
+    public function getTemplateManager()
+    {
+        return $this->templateManager;
+    }
+
+    /**
+     * Get parser manager
+     *
+     * @return \Cybits\Elbish\Parser\Manager
+     */
+    public function getParserManager()
+    {
+        return $this->parserManager;
     }
 }

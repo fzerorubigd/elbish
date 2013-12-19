@@ -17,6 +17,6 @@ collections:
   path: collections
   post_word_limit: 100
 
-twig:
+template:
+  default_engine: twig
   path: templates
-

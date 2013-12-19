@@ -2,6 +2,8 @@
 
 namespace Cybits\Elbish\Parser;
 
+use Cybits\Elbish\Application;
+use Cybits\Elbish\ApplicationAwareInterface;
 use Cybits\Elbish\Exception\NotSupported;
 use RomaricDrigon\MetaYaml\MetaYaml;
 
@@ -10,10 +12,13 @@ use RomaricDrigon\MetaYaml\MetaYaml;
  *
  * @package Cybits\Elbish\Parser
  */
-abstract class Base implements \ArrayAccess, \IteratorAggregate
+abstract class Base implements \ArrayAccess, \IteratorAggregate, ApplicationAwareInterface
 {
     /** @var  array */
     protected $data;
+
+    /** @var  Application */
+    protected $app;
 
     /**
      * Load data into the parser
@@ -152,5 +157,17 @@ abstract class Base implements \ArrayAccess, \IteratorAggregate
     public function getIterator()
     {
         return new \ArrayIterator($this->data);
+    }
+
+    /**
+     * Called when the object is created by application
+     *
+     * @param Application $app current application
+     *
+     * @return mixed
+     */
+    public function init(Application $app)
+    {
+        $this->app = $app;
     }
 }

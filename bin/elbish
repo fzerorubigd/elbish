@@ -1,5 +1,8 @@
 #!/usr/bin/env php
 <?php
+use Cybits\Elbish\Console\Command\BuildPosts;
+use Cybits\Elbish\Console\Command\NewPost;
+
 date_default_timezone_set('UTC');
 
 set_time_limit(0);
@@ -8,4 +11,6 @@ set_time_limit(0);
 $autoLoader = include (__DIR__ . "/../vendor/autoload.php");
 
 $elbish = Cybits\Elbish\Application::createInstance($autoLoader);
+$this->add(new NewPost());
+$this->add(new BuildPosts());
 $elbish->run();

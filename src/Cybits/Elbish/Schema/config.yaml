@@ -24,12 +24,16 @@ root:
         plugin_dir:
           _type: text
 
-    twig:
+    template:
       _type: array
       _ignore_extra_keys: true
+      _required: true
       _children:
         path:
           _type: text
+        default_engine:
+          _type: text
+          _required: true
 
     posts:
       _type: array

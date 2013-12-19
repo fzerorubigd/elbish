@@ -108,11 +108,10 @@ EOT
      */
     private function processFile(SplFileInfo $file, $targetFolder)
     {
-        $post = $this->getApplication()->getParserForFile($file->getRealPath());
+        $post = $this->getApplication()
+            ->getParserManager()->getParserForPostFile($file->getRealPath());
         $post->loadFrontMatter($file->getRealPath());
-        $twig = $this->getApplication()->getTwig();
-        //TODO : Template plugin to use other type of markups, like mustache or handlebars
-        $result = $twig->render('post.twig', array('post' => $post));
+        $result = $post->render();
 
         $target = $targetFolder . '/' . $this->getTargetFolder($post, $file);
         if (!is_dir(dirname($target))) {

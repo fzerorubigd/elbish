@@ -12,6 +12,8 @@ root:
       _type: text
     author:
       _type: text
+    template_engine:
+      _type: text
     tags:
       _type: array
       _ignore_extra_keys: true

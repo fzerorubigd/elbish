@@ -2,6 +2,8 @@
 
 namespace Cybits;
 
+use Cybits\Elbish\Console\Command\BuildPosts;
+use Cybits\Elbish\Console\Command\NewPost;
 use Symfony\Component\Console\Tester\CommandTester;
 use Testing\TestingBootstrap;
 
@@ -32,6 +34,7 @@ class CommandsTest extends \PHPUnit_Framework_TestCase
             @rmdir('__');
         }
         $app = Elbish\Application::createInstance(TestingBootstrap::getLoader());
+        $app->add(new NewPost());
         $this->assertInstanceOf('\\Cybits\\Elbish\\Parser\\Config', $app->getConfig());
         $command = $app->find('new-post');
 
@@ -62,6 +65,7 @@ class CommandsTest extends \PHPUnit_Framework_TestCase
             touch('__example__.md');
         }
         $app = Elbish\Application::createInstance(TestingBootstrap::getLoader());
+        $app->add(new NewPost);
         $command = $app->find('new-post');
 
         $cmdTester = new CommandTester($command);
@@ -106,6 +110,7 @@ class CommandsTest extends \PHPUnit_Framework_TestCase
         $this->delTree('_target');
 
         $app = Elbish\Application::createInstance(TestingBootstrap::getLoader());
+        $app->add(new BuildPosts());
         $command = $app->find('build-posts');
 
         $cmdTester = new CommandTester($command);
