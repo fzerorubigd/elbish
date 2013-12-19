@@ -4,13 +4,14 @@ site:
   base_url: http://cyberrabbits.net
   target_dir: _target
   cache_dir: _cache
-  post_url: ':year/:month/:slug'
+  plugin_dir: _plugins
+  post_url: ':ext/:year/:month/:slug'
   no_ext: true
 
 posts:
   path: posts
 
-  new_post_pattern: :ext/:year/:month
+  new_post_pattern: :ext/:year/:month/
 
 collections:
   path: collections

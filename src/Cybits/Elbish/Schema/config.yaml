@@ -23,6 +23,8 @@ root:
           _type: text
         cache_dir:
           _type: text
+        plugin_dir:
+          _type: text
 
     twig:
       _type: array

@@ -6,5 +6,5 @@ set_time_limit(0);
 
 require __DIR__ . "/../vendor/autoload.php";
 
-$elbish = Cybits\Elbish\Application::getInstance();
+$elbish = Cybits\Elbish\Application::createInstance();
 $elbish->run();

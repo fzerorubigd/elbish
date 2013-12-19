@@ -82,21 +82,18 @@ EOT
     private function getTargetFolder(Post $post, \SplFileInfo $file)
     {
         $target = $this->getApplication()->getConfig()->get('site.post_url', ':year/:month/:slug');
-        $noExt = $this->getApplication()->getConfig()->get('site.no_ext', true);
 
-        $overwrite = array(':slug' => $file->getBasename('.' . $file->getExtension()));
+        $overwrite = array(
+            ':slug' => $file->getBasename('.' . $file->getExtension()),
+            ':ext' => $file->getExtension()
+        );
 
         foreach ($post as $key => $value) {
             if (is_scalar($value)) {
                 $overwrite[':' . $key] = $value;
             }
         }
-        $target = $this->getPattern($target, $post->getDate(), $overwrite);
-        if ($noExt) {
-            $target .= '/index.html';
-        } else {
-            $target .= '.html';
-        }
+        $target = $this->getPattern($target, $post->getDate(), $overwrite) . '/index.html';
 
         return $target;
     }

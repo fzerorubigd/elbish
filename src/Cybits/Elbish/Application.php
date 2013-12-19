@@ -14,8 +14,6 @@ use Cybits\Elbish\Parser\Post;
  */
 class Application extends \Symfony\Component\Console\Application
 {
-    protected static $instance;
-
     const VERSION = '0.1.0';
     const APP_NAME = 'elbish, Static publishing system';
 
@@ -28,6 +26,9 @@ class Application extends \Symfony\Component\Console\Application
     /** @var  Parser\Post[] */
     protected $parsers = array();
 
+    /** @var  Plugin\Loader */
+    protected $pluginLoader;
+
     /**
      * Create new application and add default command and parsers to it
      */
@@ -38,11 +39,38 @@ class Application extends \Symfony\Component\Console\Application
         $this->add(new NewPost());
         $this->add(new BuildPosts());
 
-
         // Register default parsers
         // Post parser is available if there is no other parser is there
         $this->registerParser(new Post());
         $this->registerParser(new Post\Markdown());
+
+        $this->pluginLoader = new Plugin\Loader();
+        $dir = $this->getCurrentDir() . '/' . $this->getConfig()->get('site.plugin_dir', '_plugins');
+        if (is_dir($dir)) {
+            $this->loadPlugins($dir);
+        }
+        //TODO: Support for user wide and system wide plugins
+    }
+
+    /**
+     * Load plugins from directory
+     *
+     * @param string $directory directory to load plugin from
+     */
+    protected function loadPlugins($directory)
+    {
+        $plugins = $this->pluginLoader->loadPlugins($directory);
+        foreach ($plugins as &$classes) {
+            if ($classes) {
+                foreach ($classes as $key => $class) {
+                    if ($class instanceof Post) {
+                        $this->registerParser($class);
+                    } else {
+                        unset($classes[$key]);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -50,13 +78,9 @@ class Application extends \Symfony\Component\Console\Application
      *
      * @return Application
      */
-    public static function getInstance()
+    public static function createInstance()
     {
-        if (!self::$instance) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
+        return new self();
     }
 
     /**
@@ -88,7 +112,7 @@ class Application extends \Symfony\Component\Console\Application
                 //$output->writeln('<comment>Config file is not available in current directory.</comment>');
                 $this->config = new Config(array());
             } else {
-                $this->config = new Config($this->currentDir . '/config.yaml');
+                $this->config = new Config($this->getCurrentDir() . '/config.yaml');
             }
         }
 
@@ -146,5 +170,15 @@ class Application extends \Symfony\Component\Console\Application
         $this->initTwig();
 
         return $this->twig;
+    }
+
+    /**
+     * Get current plugin loader
+     *
+     * @return \Cybits\Elbish\Plugin\Loader
+     */
+    public function getPluginLoader()
+    {
+        return $this->pluginLoader;
     }
 }

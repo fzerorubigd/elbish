@@ -21,6 +21,9 @@ class Loader
      */
     public function loadPlugins($directory)
     {
+        if (!is_dir($directory)) {
+            return false;
+        }
         $result = array();
         $finder = Finder::create();
         $finder->files()->in($directory)->name('/\.php$/');
@@ -31,7 +34,7 @@ class Loader
             try {
                 $data = $parser->parse($file->getContents());
 
-                $classes = $this->findClasses($data);
+                $classes = $this->findClasses($file->getRealPath(), $data);
                 foreach ($classes as $class => &$object) {
                     $object = $this->safeLoadClasses($class, $file->getRealPath());
                 }
@@ -48,12 +51,13 @@ class Loader
     /**
      * Find classes inside the $data array from parser, recursive.
      *
-     * @param \PHPParser_Node[] $data   array of nodes
-     * @param string            $prefix last namespace name
+     * @param string            $fileName file name contain this
+     * @param \PHPParser_Node[] $data     array of nodes
+     * @param string            $prefix   last namespace name
      *
      * @return array of class names
      */
-    private function findClasses($data, $prefix = '')
+    private function findClasses($fileName, $data, $prefix = '')
     {
         $classes = array();
         foreach ($data as $node) {
@@ -63,14 +67,16 @@ class Loader
                 } else {
                     $newPrefix = $prefix . $node->name;
                 }
-                $classes = array_merge($classes, $this->findClasses($node->stmts, $newPrefix));
+                $classes = array_merge($classes, $this->findClasses($fileName, $node->stmts, $newPrefix));
             } elseif ($node->getType() == 'Stmt_Class') {
                 $class = $prefix . '\\' . $node->name;
                 if (class_exists($class)) {
-                    return false;
-                } else {
-                    $classes[$prefix . '\\' . $node->name] = true;
+                    $reflection = new \ReflectionClass($class);
+                    if ($reflection->getFileName() != $fileName) {
+                        return false;
+                    }
                 }
+                $classes[$prefix . '\\' . $node->name] = true;
             }
         }
 
@@ -87,7 +93,7 @@ class Loader
      */
     private function safeLoadClasses($className, $fileName)
     {
-        if (!class_exists($className)) {
+        if (!in_array($fileName, get_included_files())) {
             // Maybe require_once and then throw an exception on error
             require($fileName);
         }

@@ -21,7 +21,7 @@ class CommandsTest extends \PHPUnit_Framework_TestCase
             @unlink('__/__example__.md');
             @rmdir('__');
         }
-        $app = Elbish\Application::getInstance();
+        $app = Elbish\Application::createInstance();
         $this->assertInstanceOf('\\Cybits\\Elbish\\Parser\\Config', $app->getConfig());
         $command = $app->find('new-post');
 
@@ -51,7 +51,7 @@ class CommandsTest extends \PHPUnit_Framework_TestCase
         if (!file_exists('__example__.md')) {
             touch('__example__.md');
         }
-        $app = Elbish\Application::getInstance();
+        $app = Elbish\Application::createInstance();
         $command = $app->find('new-post');
 
         $cmdTester = new CommandTester($command);
@@ -95,7 +95,7 @@ class CommandsTest extends \PHPUnit_Framework_TestCase
         $this->delTree('_cache');
         $this->delTree('_target');
 
-        $app = Elbish\Application::getInstance();
+        $app = Elbish\Application::createInstance();
         $command = $app->find('build-posts');
 
         $cmdTester = new CommandTester($command);
@@ -107,12 +107,14 @@ class CommandsTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertContains("Processing example.md  .... DONE", $cmdTester->getDisplay());
+        $this->assertFileExists($this->examplePath . '/_target/md/13/12/example/index.html');
         $cmdTester->execute(
             array(
                 'command' => $command->getName()
             )
         );
         $this->assertContains("Processing example.md  .... File has no change. skipping", $cmdTester->getDisplay());
+        $this->assertFileExists($this->examplePath . '/_target/md/13/12/example/index.html');
         $cmdTester->execute(
             array(
                 'command' => $command->getName(),
@@ -129,5 +131,6 @@ class CommandsTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertContains("Processing example.md  .... DONE", $cmdTester->getDisplay());
+        $this->assertFileExists($this->examplePath . '/_target/md/13/12/example/index.html');
     }
 }
