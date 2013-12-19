@@ -4,7 +4,7 @@ site:
   base_url: http://cyberrabbits.net
   target_dir: _target
   cache_dir: _cache
-  plugin_dir: _plugins
+  plugin_dir: plugins
   post_url: ':ext/:year/:month/:slug'
   no_ext: true
 

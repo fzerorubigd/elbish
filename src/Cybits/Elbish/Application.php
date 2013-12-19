@@ -45,7 +45,7 @@ class Application extends \Symfony\Component\Console\Application
         $this->registerParser(new Post\Markdown());
 
         $this->pluginLoader = new Plugin\Loader();
-        $dir = $this->getCurrentDir() . '/' . $this->getConfig()->get('site.plugin_dir', '_plugins');
+        $dir = $this->getCurrentDir() . '/' . $this->getConfig()->get('site.plugin_dir', 'plugins');
         if (is_dir($dir)) {
             $this->loadPlugins($dir);
         }
