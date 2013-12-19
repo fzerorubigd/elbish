@@ -3,14 +3,24 @@
 namespace Cybits;
 
 use Symfony\Component\Console\Tester\CommandTester;
+use Testing\TestingBootstrap;
 
+/**
+ * Class CommandsTest
+ *
+ * @package Cybits
+ */
 class CommandsTest extends \PHPUnit_Framework_TestCase
 {
 
     private $examplePath;
 
+    /**
+     * Setup the tests
+     */
     public function setUp()
     {
+        TestingBootstrap::getLoader(); // Make sure the autoloader is active
         $this->examplePath = realpath(__DIR__ . "/../example");
     }
 

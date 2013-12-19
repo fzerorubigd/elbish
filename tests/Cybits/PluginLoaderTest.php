@@ -4,6 +4,7 @@ namespace Cybits;
 
 use Cybits\Elbish\Plugin\Loader;
 use Symfony\Component\Console\Tester\CommandTester;
+use Testing\TestingBootstrap;
 
 class PluginLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,6 +14,7 @@ class PluginLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        TestingBootstrap::getLoader(); // Make sure the autoloader is active
         $this->examplePath = realpath(__DIR__ . "/../example");
     }
 

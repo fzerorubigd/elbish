@@ -1,0 +1,17 @@
+---
+root:
+  _type: array
+  _ignore_extra_keys: true
+  _children:
+    title:
+      _type: text
+      _required: true
+    slug:
+      _type: text
+    processor:
+      _type: text
+      _required: true
+    parameters:
+      _type: array
+      _ignore_extra_keys: true
+      _children: []

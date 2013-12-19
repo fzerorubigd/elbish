@@ -17,8 +17,6 @@ root:
         post_url:
           _type: text
           _required: true
-        no_ext:
-          _type: boolean
         target_dir:
           _type: text
         cache_dir:
@@ -42,12 +40,9 @@ root:
         new_post_pattern:
           _type: text
 
-    posts:
+    collections:
       _type: array
       _ignore_extra_keys: true
       _children:
         path:
           _type: text
-        post_word_limit:
-          _type: number
-

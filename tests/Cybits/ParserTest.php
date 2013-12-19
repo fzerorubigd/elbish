@@ -4,14 +4,24 @@ namespace Cybits;
 
 use Cybits\Elbish\Parser\Post\Markdown;
 use Cybits\Elbish\Parser\Post;
+use Testing\TestingBootstrap;
 
+/**
+ * Class ParserTest
+ *
+ * @package Cybits
+ */
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
 
     private $examplePath;
 
+    /**
+     * Setup tests
+     */
     public function setUp()
     {
+        TestingBootstrap::getLoader(); // Make sure the autoloader is active
         $this->examplePath = realpath(__DIR__ . "/../example");
     }
 
