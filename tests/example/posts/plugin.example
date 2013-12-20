@@ -3,5 +3,6 @@ title: example post in example parser
 date: 2013/12/02
 extra: data
 data: another thing
+example: yes
 ---
 Oh, this should be reverse.

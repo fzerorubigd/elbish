@@ -2,6 +2,7 @@
 
 namespace Cybits;
 
+use Cybits\Elbish\Parser\Base;
 use Cybits\Elbish\Parser\Post\Markdown;
 use Cybits\Elbish\Parser\Post;
 use Testing\TestingBootstrap;
@@ -25,6 +26,17 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->examplePath = realpath(__DIR__ . "/../example");
     }
 
+    public function testBasicSetGet()
+    {
+        $basic = new Base();
+        $basic->loadData(array('a' => 'a', 'b' => array ('c' => 'b.c')));
+        $this->assertEquals($basic['a'], 'a');
+        $this->assertEquals($basic['b.c'], 'b.c');
+        $basic['c.d.e'] = 'set';
+        $this->assertEquals($basic['c.d.e'], 'set');
+        $this->assertEquals($basic['c.d'], array ('e' => 'set'));
+    }
+
     public function testEmptyConfig()
     {
         $empty = new Elbish\Parser\Config(false);
@@ -39,15 +51,6 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("This is my title", $config['site.title']);
         $this->assertTrue($config->has('site.title'));
         $this->assertTrue($config->offsetExists('site.title'));
-    }
-
-    /**
-     * @expectedException \Cybits\Elbish\Exception\NotSupported
-     */
-    public function testSetConfig()
-    {
-        $empty = new Elbish\Parser\Config(false);
-        $empty['test'] = 'test';
     }
 
     /**

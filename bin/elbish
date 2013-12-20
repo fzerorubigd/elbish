@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+use Cybits\Elbish\Console\Command\BuildCollections;
 use Cybits\Elbish\Console\Command\BuildPosts;
 use Cybits\Elbish\Console\Command\NewPost;
 
@@ -11,6 +12,7 @@ set_time_limit(0);
 $autoLoader = include (__DIR__ . "/../vendor/autoload.php");
 
 $elbish = Cybits\Elbish\Application::createInstance($autoLoader);
-$this->add(new NewPost());
-$this->add(new BuildPosts());
+$elbish->add(new NewPost());
+$elbish->add(new BuildPosts());
+$elbish->add(new BuildCollections());
 $elbish->run();

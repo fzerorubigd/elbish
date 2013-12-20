@@ -14,6 +14,9 @@ root:
           _type: pattern
           _required: true
           _pattern: /\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i
+        index:
+          _type: text
+          _required: true
         post_url:
           _type: text
           _required: true
@@ -50,3 +53,6 @@ root:
       _children:
         path:
           _type: text
+        per_page:
+          _type: number
+          _required: true

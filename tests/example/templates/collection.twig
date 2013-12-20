@@ -1,5 +1,11 @@
 {% extends 'master.twig' %}
 
-{% for post in collection %}
+{% block title %}{{ collection.title }} - Page {{ pager.getCurrentPage }}{% endblock %}
 
-{% endfor %}
+{% block content %}
+    {% for post in posts %}
+        <a href="{{ post._url }}">{{ post.title }}</a>
+        <a href="{{ config['site.base_url'] }}{{ post['_url'] }}">abs</a>
+        {{ post.getText|raw }}
+    {% endfor %}
+{% endblock %}

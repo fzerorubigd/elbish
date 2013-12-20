@@ -3,7 +3,9 @@
 namespace Cybits\Elbish\Template\Engine;
 
 use Cybits\Elbish\Application;
+use Cybits\Elbish\Parser\Collection;
 use Cybits\Elbish\Parser\Post;
+use Cybits\Elbish\Template\Pager;
 use Cybits\Elbish\TemplateInterface;
 
 /**
@@ -51,7 +53,6 @@ class Twig implements TemplateInterface
         $this->twig = new \Twig_Environment($loader);
         $this->twig->addGlobal('elbish', $app);
         $this->twig->addGlobal('config', $config);
-
         $this->app = $app;
     }
 
@@ -63,5 +64,26 @@ class Twig implements TemplateInterface
     public static function getName()
     {
         return 'twig';
+    }
+
+    /**
+     * Render a collection
+     *
+     * @param Collection $collection collection to render
+     * @param array      $posts      posts in collection
+     * @param Pager      $pager      pager
+     *
+     * @return string
+     */
+    public function renderCollection(Collection $collection, array $posts, Pager $pager)
+    {
+        return $this->twig->render(
+            'collection.twig',
+            array(
+                'collection' => $collection,
+                'posts' => $posts,
+                'pager' => $pager
+            )
+        );
     }
 }

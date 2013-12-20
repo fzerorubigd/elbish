@@ -2,6 +2,7 @@
 
 namespace Cybits;
 
+use Cybits\Elbish\Console\Command\BuildCollections;
 use Cybits\Elbish\Console\Command\BuildPosts;
 use Cybits\Elbish\Console\Command\NewPost;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -147,5 +148,28 @@ class CommandsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertContains("Processing example.md  .... DONE", $cmdTester->getDisplay());
         $this->assertFileExists($this->examplePath . '/_target/md/13/12/example/index.html');
+    }
+
+
+    public function testBuildCollections()
+    {
+        chdir($this->examplePath);
+        $this->delTree('_cache');
+        $this->delTree('_target');
+
+        $app = Elbish\Application::createInstance(TestingBootstrap::getLoader());
+        $app->add(new BuildPosts());
+        $app->add(new BuildCollections());
+        $command = $app->find('build-collections');
+
+        $cmdTester = new CommandTester($command);
+
+        $cmdTester->execute(
+            array(
+                'command' => $command->getName()
+            )
+        );
+
+        $this->assertContains("Processing collection all.yaml  .... DONE", $cmdTester->getDisplay());
     }
 }

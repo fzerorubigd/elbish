@@ -4,9 +4,16 @@ namespace ExampleParser;
 
 
 use Cybits\Elbish\Application;
+use Cybits\Elbish\Parser\Collection;
 use Cybits\Elbish\Parser\Post;
+use Cybits\Elbish\Template\Pager;
 use Cybits\Elbish\TemplateInterface;
 
+/**
+ * Class ExampleEngine
+ *
+ * @package ExampleParser
+ */
 class ExampleEngine implements TemplateInterface
 {
 
@@ -33,7 +40,7 @@ class ExampleEngine implements TemplateInterface
      */
     public function renderPost(Post $post)
     {
-        return ":::" . $post->getDate() . ":::";
+        return ":::" . $post->getText() . ":::";
     }
 
     /**
@@ -44,5 +51,19 @@ class ExampleEngine implements TemplateInterface
     public static function getName()
     {
         return 'fun';
+    }
+
+    /**
+     * Render a collection
+     *
+     * @param Collection $collection collection to render
+     * @param array      $posts      posts in collection
+     * @param Pager      $pager      pager
+     *
+     * @return string
+     */
+    public function renderCollection(Collection $collection, array $posts, Pager $pager)
+    {
+        // TODO: Implement renderCollection() method.
     }
 }

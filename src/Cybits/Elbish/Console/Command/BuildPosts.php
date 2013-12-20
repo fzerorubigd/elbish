@@ -93,7 +93,13 @@ EOT
                 $overwrite[':' . $key] = $value;
             }
         }
-        $target = $this->getPattern($target, $post->getDate(), $overwrite) . '/index.html';
+        $url = $this->getPattern($target, $post->getDate(), $overwrite) . '/';
+        if ($url{0} != '/') {
+            $url = '/' . $url;
+        }
+        $post['_url'] = $url;
+        $target = $post['_target'] = $url . 'index.html';
+        $this->addDataToCache($file->getRealPath(), 'url', $url);
 
         return $target;
     }
@@ -111,16 +117,17 @@ EOT
         $post = $this->getApplication()
             ->getParserManager()->getParserForPostFile($file->getRealPath());
         $post->loadFrontMatter($file->getRealPath());
-        $result = $post->render();
 
         $target = $targetFolder . '/' . $this->getTargetFolder($post, $file);
         if (!is_dir(dirname($target))) {
             mkdir(dirname($target), 0777, true);
         }
 
+        $result = $post->render();
         file_put_contents($target, $result);
         $this->addDataToCache($file->getRealPath(), 'target', $target);
         $this->addDataToCache($file->getRealPath(), 'target_md5', md5_file($target));
+        unset($post);
 
         return true;
     }
@@ -138,6 +145,7 @@ EOT
         if (!isset($this->cache[$identifier])) {
             $this->cache[$identifier] = array();
         }
+        $this->cache[$identifier]['file'] = $fileName;
         $this->cache[$identifier][$data] = $value;
     }
 

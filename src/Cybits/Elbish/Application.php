@@ -72,6 +72,8 @@ class Application extends \Symfony\Component\Console\Application
                 $this->parserManager->registerPostParser($reflection);
             } elseif ($reflection->implementsInterface('\Cybits\Elbish\TemplateInterface')) {
                 $this->templateManager->registerEngine($reflection);
+            } elseif ($reflection->isSubclassOf('\Cybits\Elbish\Parser\Collection')) {
+                $this->parserManager->registerCollectionParser($reflection);
             }
         }
     }

@@ -78,6 +78,7 @@ class PluginLoaderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\Cybits\Elbish\Plugin\Loader', $app->getPluginLoader());
         $this->assertTrue(class_exists('\\ExampleParser\\ExampleParser'));
+        $this->assertTrue(class_exists('\\ExampleParser\\ExampleEngine'));
         $command = $app->find('build-posts');
 
         $cmdTester = new CommandTester($command);
@@ -93,5 +94,11 @@ class PluginLoaderTest extends \PHPUnit_Framework_TestCase
             strrev('Oh, this should be reverse.'),
             file_get_contents($this->examplePath . '/_target/example/13/12/plugin/index.html')
         );
+
+        $this->assertEquals(
+            ':::the post:::',
+            file_get_contents($this->examplePath . '/_target/default/13/12/template/index.html')
+        );
+
     }
 }

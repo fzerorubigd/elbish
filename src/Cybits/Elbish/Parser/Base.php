@@ -4,6 +4,8 @@ namespace Cybits\Elbish\Parser;
 
 use Cybits\Elbish\Application;
 use Cybits\Elbish\ApplicationAwareInterface;
+use Cybits\Elbish\Exception\GeneralException;
+use Cybits\Elbish\Exception\NotFound;
 use Cybits\Elbish\Exception\NotSupported;
 use RomaricDrigon\MetaYaml\MetaYaml;
 
@@ -12,10 +14,10 @@ use RomaricDrigon\MetaYaml\MetaYaml;
  *
  * @package Cybits\Elbish\Parser
  */
-abstract class Base implements \ArrayAccess, \IteratorAggregate, ApplicationAwareInterface
+class Base implements \ArrayAccess, \IteratorAggregate, ApplicationAwareInterface
 {
     /** @var  array */
-    protected $data;
+    protected $data = array();
 
     /** @var  Application */
     protected $app;
@@ -29,8 +31,9 @@ abstract class Base implements \ArrayAccess, \IteratorAggregate, ApplicationAwar
     final public function loadData(array $data, $force = true)
     {
         if ($force) {
-            $schema = $this->loadSchema();
-            $schema->validate($data);
+            if ($schema = $this->loadSchema()) {
+                $schema->validate($data);
+            }
         }
         $this->data = $data;
     }
@@ -38,9 +41,12 @@ abstract class Base implements \ArrayAccess, \IteratorAggregate, ApplicationAwar
     /**
      * Get this file validator
      *
-     * @return MetaYaml
+     * @return MetaYaml|boolean
      */
-    abstract protected function loadSchema();
+    protected function loadSchema()
+    {
+        return false;
+    }
 
     /**
      * Flatten the array and get the result
@@ -63,6 +69,33 @@ abstract class Base implements \ArrayAccess, \IteratorAggregate, ApplicationAwar
         }
 
         return $current;
+    }
+
+
+    /**
+     * Flatten the array and get the result
+     *
+     * @param string $offset to get
+     * @param mixed  $value  value to set
+     *
+     * @throws GeneralException
+     */
+    public function set($offset, $value)
+    {
+        $parts = explode('.', $offset);
+        $current = & $this->data;
+        while ($part = array_shift($parts)) {
+            if (is_array($current) && array_key_exists($part, $current)) {
+                $current = & $current[$part];
+            } elseif (!is_array($current)) {
+                throw new GeneralException("Can not set $offset.");
+            } else {
+                $current[$part] = array();
+                $current = & $current[$part];
+            }
+        }
+
+        $current = $value;
     }
 
     /**
@@ -129,7 +162,7 @@ abstract class Base implements \ArrayAccess, \IteratorAggregate, ApplicationAwar
      */
     public function offsetSet($offset, $value)
     {
-        throw new NotSupported();
+        $this->set($offset, $value);
     }
 
     /**

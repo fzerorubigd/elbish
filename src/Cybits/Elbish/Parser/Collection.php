@@ -2,7 +2,9 @@
 
 namespace Cybits\Elbish\Parser;
 
+use Cybits\Elbish\Template\Pager;
 use RomaricDrigon\MetaYaml\MetaYaml;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class Collection
@@ -11,6 +13,16 @@ use RomaricDrigon\MetaYaml\MetaYaml;
  */
 class Collection extends Base
 {
+    /**
+     * Load data from yaml file
+     *
+     * @param string $content yaml file
+     */
+    public function loadYamlFile($content)
+    {
+        $data = Yaml::parse($content);
+        $this->loadData($data);
+    }
 
     /**
      * Get this file validator
@@ -54,5 +66,66 @@ class Collection extends Base
     {
         // This is the default behavior, any post is accepted.
         return true;
+    }
+
+    /**
+     * Get if this processor support the file type
+     *
+     * @param string $fileName file name to check
+     *
+     * @return boolean
+     */
+    public static function isSupported($fileName)
+    {
+        return file_exists($fileName);
+    }
+
+    /**
+     * Get item per page for this collection
+     *
+     * @return integer
+     */
+    public function getPerPage()
+    {
+        $result = $this->app->getConfig()->get('collection.per_page', 10);
+        if ($this->has('per_page')) {
+            $result = $this->get('per_page');
+        }
+
+        return $result;
+    }
+
+    /**
+     * Render current post
+     *
+     * @param Post[] $posts array of posts in this collection
+     *
+     * @return string[]
+     */
+    public function render(array $posts)
+    {
+        $engine = $this->app->getConfig()->get('template.default_engine', 'twig');
+        if ($this['template_engine']) {
+            $engine = $this['template_engine'];
+        }
+
+        $result = array();
+        $page = 0;
+        $perPage = $this->getPerPage();
+        $total = $remain = count($posts);
+        $pager = new Pager($total, $perPage);
+        $pager->setPattern($this['_url']);
+        while ($remain > 0) {
+            $currentPosts = array_slice($posts, $page * $perPage, $perPage);
+            $page++;
+            $pager->setCurrentPage($page);
+            $remain -= $page * $perPage;
+            $result[$page] = $this->app
+                ->getTemplateManager()
+                ->getEngine($engine)
+                ->renderCollection($this, $currentPosts, $pager);
+        }
+
+        return $result;
     }
 }

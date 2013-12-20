@@ -3,5 +3,7 @@
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
+    <a href="{{ post['_url'] }}">Relative path</a>
+    <a href="{{ config['site.base_url'] }}{{ post['_url'] }}">abs</a>
 {{ post.getText|raw }}
 {% endblock %}

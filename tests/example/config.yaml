@@ -6,16 +6,17 @@ site:
   cache_dir: _cache
   plugin_dir: plugins
   post_url: ':ext/:year/:month/:slug'
-  no_ext: true
+  collection_url: 'tag/:slug/:page'
+  index: posts/example.md
 
 posts:
   path: posts
-
   new_post_pattern: :ext/:year/:month/
 
 collections:
   path: collections
   post_word_limit: 100
+  per_page: 10
 
 template:
   default_engine: twig

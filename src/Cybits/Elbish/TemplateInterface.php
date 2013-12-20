@@ -2,7 +2,9 @@
 
 namespace Cybits\Elbish;
 
+use Cybits\Elbish\Parser\Collection;
 use Cybits\Elbish\Parser\Post;
+use Cybits\Elbish\Template\Pager;
 
 /**
  * Interface TemplateInterface
@@ -19,6 +21,17 @@ interface TemplateInterface extends ApplicationAwareInterface
      * @return string
      */
     public function renderPost(Post $post);
+
+    /**
+     * Render a collection
+     *
+     * @param Collection $collection collection to render
+     * @param array      $posts      posts in collection
+     * @param Pager      $pager      pager
+     *
+     * @return string
+     */
+    public function renderCollection(Collection $collection, array $posts, Pager $pager);
 
     /**
      * Get the name of this engine, used for identify engine for posts or other thing

@@ -1,6 +1,6 @@
 ---
-title: 'All posts'
-slug: posts
+title: 'Example=yes posts'
+slug: yes
 per_page: 10
 parameters:
   order: date
