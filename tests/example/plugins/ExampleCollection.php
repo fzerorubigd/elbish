@@ -55,6 +55,5 @@ class ExampleCollection extends Collection
         $ext = strtolower($info['extension']);
 
         return in_array($ext, array('custom'));
-;
     }
 }
