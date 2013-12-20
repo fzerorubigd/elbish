@@ -5,7 +5,6 @@ namespace Cybits\Elbish\Console\Command;
 
 use Cybits\Elbish\Parser\Collection;
 use Cybits\Elbish\Parser\Post;
-use Cybits\Elbish\Template\Pager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,14 +28,8 @@ class BuildCollections extends Base
     {
         $cacheDir = $this->getApplication()->getCurrentDir() . '/' .
             $this->getApplication()->getConfig()->get('site.cache_dir', '_cache');
-
-        if (is_readable($cacheDir . '/posts.cache.yaml')) {
-            try {
-                $this->cache = Yaml::parse($cacheDir . '/posts.cache.yaml');
-            } catch (\Exception $e) {
-                $this->cache = array();
-            }
-        }
+        // Cache must be there. so no exception is expected
+        $this->cache = Yaml::parse($cacheDir . '/posts.cache.yaml');
     }
 
     /**
@@ -50,7 +43,7 @@ class BuildCollections extends Base
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force rebuild all posts before building the collection')
             ->setHelp(
                 <<<EOT
-Build all collections.
+    Build all collections.
 EOT
             );
     }

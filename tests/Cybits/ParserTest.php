@@ -35,6 +35,11 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $basic['c.d.e'] = 'set';
         $this->assertEquals($basic['c.d.e'], 'set');
         $this->assertEquals($basic['c.d'], array ('e' => 'set'));
+        $basic['c.d.f'] = 'cdf';
+        $this->assertEquals($basic['c.d.f'], 'cdf');
+        $this->assertEquals($basic['c.d'], array ('e' => 'set', 'f' => 'cdf'));
+        $this->setExpectedException('\\Cybits\\Elbish\\Exception\\GeneralException');
+        $basic['c.d.f.g'] = 'exception!';
     }
 
     public function testEmptyConfig()

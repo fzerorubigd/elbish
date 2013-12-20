@@ -5,7 +5,6 @@ namespace Cybits\Elbish\Parser;
 use Cybits\Elbish\Application;
 use Cybits\Elbish\ApplicationAwareInterface;
 use Cybits\Elbish\Exception\GeneralException;
-use Cybits\Elbish\Exception\NotFound;
 use Cybits\Elbish\Exception\NotSupported;
 use RomaricDrigon\MetaYaml\MetaYaml;
 
