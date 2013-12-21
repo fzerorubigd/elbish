@@ -161,17 +161,15 @@ EOT
         // For now all files are markdown files
         $hash = md5_file($file->getRealPath());
         $identifier = md5($file->getRealPath()); // :)
-        if (isset($this->cache[$identifier])) {
-            $data = $this->cache[$identifier];
-            if (isset($data['md5']) &&
-                isset($data['target']) &&
-                isset($data['target_md5']) &&
-                $data['md5'] == $hash &&
-                is_readable($data['target']) &&
-                md5_file($data['target']) == $data['target_md5']
-            ) {
-                return true;
-            }
+        if (isset($this->cache[$identifier]) &&
+            isset($this->cache[$identifier]['md5']) &&
+            isset($this->cache[$identifier]['target']) &&
+            isset($this->cache[$identifier]['target_md5']) &&
+            $this->cache[$identifier]['md5'] == $hash &&
+            is_readable($this->cache[$identifier]['target']) &&
+            md5_file($this->cache[$identifier]['target']) == $this->cache[$identifier]['target_md5']
+        ) {
+            return true;
         }
 
         return false;

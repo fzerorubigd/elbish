@@ -1,5 +1,5 @@
 /vendor
-composer.phar
+*.phar
 composer.lock
 *.swp
 *.swo
