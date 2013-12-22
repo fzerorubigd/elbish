@@ -11,11 +11,9 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @package Cybits\Elbish\Parser
  */
-class Post extends Base
+class Post extends Page
 {
     protected $text;
-
-    protected $fileName;
 
     /**
      * Load a front matter file, if this class not support that file has any problem then
@@ -30,7 +28,7 @@ class Post extends Base
         if (!$this->isSupported($fileName)) {
             return false;
         }
-        $this->fileName = $fileName;
+        $this->setFileName($fileName);
         try {
             $frontMatter = FrontMatter::parse($fileName);
             $this->text = $frontMatter['text'];
@@ -64,19 +62,6 @@ class Post extends Base
         $schema = new MetaYaml(Yaml::parse($schemaFile), true);
 
         return $schema;
-    }
-
-    /**
-     * Is this file supported with this parser or not.
-     *
-     * @param string $fileName file name to load
-     *
-     * @return bool if the file is supported then load is happen here
-     */
-    public static function isSupported($fileName)
-    {
-        // This default support every file type, so work as a fallback.
-        return file_exists($fileName);
     }
 
     /**

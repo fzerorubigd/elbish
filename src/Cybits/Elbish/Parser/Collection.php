@@ -11,16 +11,17 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @package Cybits\Elbish\Parser
  */
-class Collection extends Base
+class Collection extends Page
 {
     /**
      * Load data from yaml file
      *
-     * @param string $content yaml file
+     * @param string $fileName yaml file
      */
-    public function loadYamlFile($content)
+    public function loadYamlFile($fileName)
     {
-        $data = Yaml::parse($content);
+        $this->setFileName($fileName);
+        $data = Yaml::parse($fileName);
         $this->loadData($data);
     }
 
@@ -66,18 +67,6 @@ class Collection extends Base
     {
         // This is the default behavior, any post is accepted.
         return true;
-    }
-
-    /**
-     * Get if this processor support the file type
-     *
-     * @param string $fileName file name to check
-     *
-     * @return boolean
-     */
-    public static function isSupported($fileName)
-    {
-        return file_exists($fileName);
     }
 
     /**

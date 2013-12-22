@@ -7,7 +7,7 @@ site:
   plugin_dir: plugins
   post_url: ':ext/:year/:month/:slug'
   collection_url: 'tag/:slug/:page'
-  index: posts/example.md
+  index: collections/all.yaml
 
 posts:
   path: posts

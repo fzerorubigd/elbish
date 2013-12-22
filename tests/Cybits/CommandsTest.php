@@ -172,4 +172,46 @@ class CommandsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertContains("Processing collection all.yaml  .... DONE", $cmdTester->getDisplay());
     }
+
+    public function testIndexPage()
+    {
+        chdir($this->examplePath);
+        $this->delTree('_cache');
+        $this->delTree('_target');
+
+        $app = Elbish\Application::createInstance(TestingBootstrap::getLoader());
+        $app->getConfig()->set('site.index', 'posts/example.md');
+        $app->add(new BuildPosts());
+        $app->add(new BuildCollections());
+        $command = $app->find('build-collections');
+
+        $cmdTester = new CommandTester($command);
+
+        $cmdTester->execute(
+            array(
+                'command' => $command->getName()
+            )
+        );
+
+        $this->assertFileEquals(
+            $this->examplePath . '/_target/index.html',
+            $this->examplePath . '/_target/md/13/12/example/index.html'
+        );
+
+        $app->getConfig()->set('site.index', 'collections/all.yaml');
+        $command = $app->find('build-collections');
+
+        $cmdTester = new CommandTester($command);
+
+        $cmdTester->execute(
+            array(
+                'command' => $command->getName()
+            )
+        );
+
+        $this->assertFileEquals(
+            $this->examplePath . '/_target/index.html',
+            $this->examplePath . '/_target/tag/posts/1/index.html'
+        );
+    }
 }

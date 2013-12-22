@@ -125,6 +125,9 @@ EOT
 
         $result = $post->render();
         file_put_contents($target, $result);
+        if ($post->isIndex()) {
+            $this->makeIndexLink($target, $targetFolder . '/index.html');
+        }
         $this->addDataToCache($file->getRealPath(), 'target', $target);
         $this->addDataToCache($file->getRealPath(), 'target_md5', md5_file($target));
         unset($post);

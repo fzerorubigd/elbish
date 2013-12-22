@@ -39,4 +39,17 @@ class Base extends Command
 
         return strtr($pattern, $source);
     }
+
+    /**
+     * Create a link to index file (or simply create a copy here?)
+     *
+     * @param string $file  the base file name
+     * @param string $index the target file
+     */
+    protected function makeIndexLink($file, $index)
+    {
+        //This is here for forward-compatibility
+        //For now, just copy the content here again.
+        copy($file, $index);
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace Cybits;
 
+use Cybits\Elbish\Application;
 use Cybits\Elbish\Parser\Base;
 use Cybits\Elbish\Parser\Post\Markdown;
 use Cybits\Elbish\Parser\Post;
@@ -17,6 +18,8 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     private $examplePath;
 
+    private $app;
+
     /**
      * Setup tests
      */
@@ -24,20 +27,28 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         TestingBootstrap::getLoader(); // Make sure the autoloader is active
         $this->examplePath = realpath(__DIR__ . "/../example");
+        chdir($this->examplePath);
+        $this->app = new Application(TestingBootstrap::getLoader());
     }
+
+    protected function tearDown()
+    {
+        \Mockery::close();
+    }
+
 
     public function testBasicSetGet()
     {
         $basic = new Base();
-        $basic->loadData(array('a' => 'a', 'b' => array ('c' => 'b.c')));
+        $basic->loadData(array('a' => 'a', 'b' => array('c' => 'b.c')));
         $this->assertEquals($basic['a'], 'a');
         $this->assertEquals($basic['b.c'], 'b.c');
         $basic['c.d.e'] = 'set';
         $this->assertEquals($basic['c.d.e'], 'set');
-        $this->assertEquals($basic['c.d'], array ('e' => 'set'));
+        $this->assertEquals($basic['c.d'], array('e' => 'set'));
         $basic['c.d.f'] = 'cdf';
         $this->assertEquals($basic['c.d.f'], 'cdf');
-        $this->assertEquals($basic['c.d'], array ('e' => 'set', 'f' => 'cdf'));
+        $this->assertEquals($basic['c.d'], array('e' => 'set', 'f' => 'cdf'));
         $this->setExpectedException('\\Cybits\\Elbish\\Exception\\GeneralException');
         $basic['c.d.f.g'] = 'exception!';
     }
@@ -70,12 +81,14 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function testValidPost()
     {
         $post = new Post();
+        $post->init($this->app);
         $this->assertTrue($post->loadFrontMatter($this->examplePath . "/posts/example.md"));
         $this->assertContains("This is an example post.", $post->getText());
         $this->assertTrue($post->isSupported($this->examplePath . "/posts/example.md"));
         $this->assertTrue($post->isSupported($this->examplePath . "/config.yaml"));
 
         $post = new Markdown();
+        $post->init($this->app);
         $this->assertTrue($post->loadFrontMatter($this->examplePath . "/posts/example.md"));
         $this->assertContains("<p>This is an example post.</p>", $post->getText());
         $this->assertTrue($post->isSupported($this->examplePath . "/posts/example.md"));
@@ -88,6 +101,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function testPostDate()
     {
         $post = new Post();
+        $post->init($this->app);
         $this->assertTrue($post->loadFrontMatter($this->examplePath . "/posts/example.md"));
         $this->assertEquals(strtotime($post['date']), $post->getDate());
         $this->assertTrue($post->loadFrontMatter($this->examplePath . "/posts/example-no-date.md"));

@@ -138,6 +138,9 @@ EOT
             }
 
             file_put_contents($current, $result);
+            if ($page == 1 && $collection->isIndex()) {
+                $this->makeIndexLink($current, $targetFolder . '/index.html');
+            }
         }
     }
 
