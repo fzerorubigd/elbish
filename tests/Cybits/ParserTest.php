@@ -31,12 +31,6 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->app = new Application(TestingBootstrap::getLoader());
     }
 
-    protected function tearDown()
-    {
-        \Mockery::close();
-    }
-
-
     public function testBasicSetGet()
     {
         $basic = new Base();
