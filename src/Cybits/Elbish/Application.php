@@ -68,11 +68,11 @@ class Application extends \Symfony\Component\Console\Application
 
         foreach (array_keys($plugins) as $class) {
             $reflection = new \ReflectionClass('\\' . $class);
-            if ($reflection->isSubclassOf('\Cybits\Elbish\Parser\Post')) {
+            if ($reflection->isSubclassOf('Cybits\Elbish\Parser\Post')) {
                 $this->parserManager->registerPostParser($reflection);
-            } elseif ($reflection->implementsInterface('\Cybits\Elbish\TemplateInterface')) {
+            } elseif ($reflection->implementsInterface('Cybits\Elbish\TemplateInterface')) {
                 $this->templateManager->registerEngine($reflection);
-            } elseif ($reflection->isSubclassOf('\Cybits\Elbish\Parser\Collection')) {
+            } elseif ($reflection->isSubclassOf('Cybits\Elbish\Parser\Collection')) {
                 $this->parserManager->registerCollectionParser($reflection);
             }
         }
