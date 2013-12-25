@@ -16,10 +16,16 @@ class MiscTest extends \PHPUnit_Framework_TestCase
 {
     public function testPager()
     {
-        $pager = new Pager(100, 10);
-        $pager->setPattern(':page');
+        $pager = new Pager(999, ':page', 10);
         $this->assertEquals(':page', $pager->getPattern());
-        $this->assertEquals('100', $pager->getTarget(100));
+        $pager->setPattern('page/:page');
+        $this->assertEquals('page/:page', $pager->getPattern());
+        $this->assertEquals('page/100', $pager->getTarget(100));
+        $this->assertEquals(7, count($pager->getIterator()));
+        $pager->setCurrentPage(100);
+        $this->assertEquals(7, count($pager->getIterator()));
+        $pager->setCurrentPage(50);
+        $this->assertEquals(13, count($pager->getIterator()));
     }
 
     public function testTemplateManager()

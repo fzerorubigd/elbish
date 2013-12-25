@@ -8,4 +8,14 @@
         <a href="{{ config['site.base_url'] }}{{ post['_url'] }}">abs</a>
         {{ post.getText|raw }}
     {% endfor %}
+
+    <ul>
+        {% for page in pager %}
+            <li>
+                {% if page.number > 0 %}
+                    <a href="{{ page.link }}" {% if page.current %}class="current"{% endif %}>{{ page.number }}</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
 {% endblock %}

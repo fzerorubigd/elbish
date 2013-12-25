@@ -72,7 +72,11 @@ EOT
                 $overwrite[':' . $key] = $value;
             }
         }
-        $collection['_url'] = $url = $this->getPattern($target, time(), $overwrite);
+        $url = $this->getPattern($target, time(), $overwrite);
+        if ($url{0} != '/') {
+            $url = '/' . $url;
+        }
+        $collection['_url'] = $url;
         $collection['_target'] = $target = $url . '/index.html';
 
         return $target;

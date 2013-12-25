@@ -102,8 +102,7 @@ class Collection extends Page
         $page = 0;
         $perPage = $this->getPerPage();
         $total = $remain = count($posts);
-        $pager = new Pager($total, $perPage);
-        $pager->setPattern($this['_url']);
+        $pager = new Pager($total, $this['_url'], $perPage);
         while ($remain > 0) {
             $currentPosts = array_slice($posts, $page * $perPage, $perPage);
             $page++;
