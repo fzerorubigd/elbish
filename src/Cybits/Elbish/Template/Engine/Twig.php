@@ -30,7 +30,9 @@ class Twig implements TemplateInterface
      */
     public function renderPost(Post $post)
     {
-        return $this->twig->render('post.twig', array('post' => $post));
+        $twig = $post->get('twig_file', 'post.twig');
+
+        return $this->twig->render($twig, array('post' => $post));
     }
 
     /**
@@ -77,8 +79,10 @@ class Twig implements TemplateInterface
      */
     public function renderCollection(Collection $collection, array $posts, Pager $pager)
     {
+        $twig = $collection->get('twig_file', 'collection.twig');
+
         return $this->twig->render(
-            'collection.twig',
+            $twig,
             array(
                 'collection' => $collection,
                 'posts' => $posts,
