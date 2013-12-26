@@ -14,6 +14,8 @@
             <li>
                 {% if page.number > 0 %}
                     <a href="{{ page.link }}" {% if page.current %}class="current"{% endif %}>{{ page.number }}</a>
+                {% else %}
+                    ...
                 {% endif %}
             </li>
         {% endfor %}
